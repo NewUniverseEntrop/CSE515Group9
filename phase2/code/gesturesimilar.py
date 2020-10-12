@@ -97,8 +97,8 @@ elif option == 'lda':
     for gesture2, fea2 in enumerate(X_reduced):
         dist[i2f[gesture2]] = spatial.distance.euclidean(fea1, fea2)
     dist = [(k, v) for k, v in sorted(dist.items(), key = lambda item : item[1])]
-elif option == 'ed':
-    datakey = 'winsymb'
+elif option == 'ed' or option == 'dtw':
+    datakey = 'winsymb' if option == 'ed' else 'winavg'
     gesture1 = words[gestureselect]
     for gesture, value in words.items():
         series1 = []
@@ -108,15 +108,23 @@ elif option == 'ed':
         for component, data in value.items():
             for sensor, wins in data.items():
                 # ordering of the windows was not preserved in the file, so we sort them here
-                series2.append([ast.literal_eval(v) for k, v in sorted(wins[datakey].items(), key=lambda item: int(item[0]))])
-                series1.append([ast.literal_eval(v) for k, v in sorted(gesture1[component][sensor][datakey].items(), key=lambda item: int(item[0]))])
+                if option == 'ed':
+                    series2.append([ast.literal_eval(v) for k, v in sorted(wins[datakey].items(), key=lambda item: int(item[0]))])
+                    series1.append([ast.literal_eval(v) for k, v in sorted(gesture1[component][sensor][datakey].items(), key=lambda item: int(item[0]))])
+                else:
+                    series2.append([v for k, v in sorted(wins[datakey].items(), key=lambda item: int(item[0]))])
+                    series1.append([v for k, v in sorted(gesture1[component][sensor][datakey].items(), key=lambda item: int(item[0]))])
                 avg1.append(gesture1[component][sensor]['avg'])
                 avg2.append(wins['avg'])
                 std1.append(gesture1[component][sensor]['std'])
                 std2.append(wins['std'])
-        dist[gesture] = editdist(series1, series2, avg1, avg2, std1, std2)
+        if option == 'ed':
+            dist[gesture] = editdist(series1, series2, avg1, avg2, std1, std2)
+        else:
+            dist[gesture] = dtw(series1, series2, avg1, avg2, std1, std2)
 
     dist = [(k, v) for k, v in sorted(dist.items(), key = lambda item : item[1])]
+'''
 elif option == 'dtw':
     datakey = 'winavg'
     gesture1 = words[gestureselect]
@@ -131,6 +139,6 @@ elif option == 'dtw':
         dist[gesture] = dtw(series1, series2)
 
     dist = [(k, v) for k, v in sorted(dist.items(), key = lambda item : item[1])]
-
+'''
 print(dist[0 : 10])
 

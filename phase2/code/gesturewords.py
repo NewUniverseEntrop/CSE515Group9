@@ -52,8 +52,8 @@ for filename in documents:
                 result[component][idx]['winavg'] = OrderedDict()   # map for storing average quantized amplitude
                 for i in range(0, len(digi) - w + 1, step):
                     result[component][idx]['winsymb'][i] = str(digi[i : i + w]) # average quantized amplitude
-                    symbo = np.digitize(statistics.mean(pos[i : i + w]), bins, True)
-                    symbo = 1 if symbo == 0 else symbo
-                    result[component][idx]['winavg'][i] = symbo    # average quantized amplitude
+                    #symbo = np.digitize(statistics.mean(pos[i : i + w]), bins, True)
+                    #symbo = 1 if symbo == 0 else symbo
+                    result[component][idx]['winavg'][i] = statistics.mean(digi[i : i + w])    # average quantized amplitude
     with open("../" + str(fn) + ".wrd","w") as f:
         json.dump(result,f,indent=2)
