@@ -83,7 +83,7 @@ elif option == 'pca':
         fea1 = X_reduced[i]
         for j in range(i, len(f2i)):
             fea2 = X_reduced[j]
-            distmatrix[i][j] = distmatrix[j][i] = spatial.distance.euclidean(fea1, fea2)
+            distmatrix[i][j] = distmatrix[j][i] = 1 - spatial.distance.cosine(fea1, fea2)
 elif option == 'svd':
     svd_reload = pk.load(open(dumpfile,'rb'))
     X_reduced = svd_reload.transform(X)
@@ -91,7 +91,7 @@ elif option == 'svd':
         fea1 = X_reduced[i]
         for j in range(i, len(f2i)):
             fea2 = X_reduced[j]
-            distmatrix[i][j] = distmatrix[j][i] = spatial.distance.euclidean(fea1, fea2)
+            distmatrix[i][j] = distmatrix[j][i] = 1 - spatial.distance.cosine(fea1, fea2)
 elif option == 'nmf':
     nmf_reload = pk.load(open(dumpfile,'rb'))
     X_reduced = nmf_reload.transform(X)
@@ -99,7 +99,7 @@ elif option == 'nmf':
         fea1 = X_reduced[i]
         for j in range(i, len(f2i)):
             fea2 = X_reduced[j]
-            distmatrix[i][j] = distmatrix[j][i] = spatial.distance.euclidean(fea1, fea2)
+            distmatrix[i][j] = distmatrix[j][i] = 1 - spatial.distance.cosine(fea1, fea2)
 elif option == 'lda':
     lda_reload = pk.load(open(dumpfile,'rb'))
     X_reduced = lda_reload.transform(X)
@@ -107,7 +107,7 @@ elif option == 'lda':
         fea1 = X_reduced[i]
         for j in range(i, len(f2i)):
             fea2 = X_reduced[j]
-            distmatrix[i][j] = distmatrix[j][i] = spatial.distance.euclidean(fea1, fea2)
+            distmatrix[i][j] = distmatrix[j][i] = 1 - spatial.distance.cosine(fea1, fea2)
 elif option == 'ed':
     pass
 elif option == 'dtw':
@@ -131,7 +131,7 @@ elif option == 'dtw':
             distmatrix[i][j] = distmatrix[j][i] = dtw(series1, series2, avg1, avg2, std1, std2)
 
 # convert distance to similarity
-if option != 'dotp':
+if option == 'ed' or option == 'dtw':
     mx, mn = max(max(distmatrix)), min(min(distmatrix))
     scale = mx - mn
     distmatrix = [[1 - (ele - mn) / scale for ele in row] for row in distmatrix]

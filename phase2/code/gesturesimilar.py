@@ -74,28 +74,28 @@ elif option == 'pca':
     X_reduced = pca_reload .transform(X)
     fea1 = X_reduced[f2i[gestureselect]]
     for gesture2, fea2 in enumerate(X_reduced):
-        dist[i2f[gesture2]] = spatial.distance.euclidean(fea1, fea2)
+        dist[i2f[gesture2]] = spatial.distance.cosine(fea1, fea2)
     dist = [(k, v) for k, v in sorted(dist.items(), key = lambda item : item[1])]
 elif option == 'svd':
     svd_reload = pk.load(open(dumpfile,'rb'))
     X_reduced = svd_reload.transform(X)
     fea1 = X_reduced[f2i[gestureselect]]
     for gesture2, fea2 in enumerate(X_reduced):
-        dist[i2f[gesture2]] = spatial.distance.euclidean(fea1, fea2)
+        dist[i2f[gesture2]] = spatial.distance.cosine(fea1, fea2)
     dist = [(k, v) for k, v in sorted(dist.items(), key = lambda item : item[1])]
 elif option == 'nmf':
     nmf_reload = pk.load(open(dumpfile,'rb'))
     X_reduced = nmf_reload.transform(X)
     fea1 = X_reduced[f2i[gestureselect]]
     for gesture2, fea2 in enumerate(X_reduced):
-        dist[i2f[gesture2]] = spatial.distance.euclidean(fea1, fea2)
+        dist[i2f[gesture2]] = spatial.distance.cosine(fea1, fea2)
     dist = [(k, v) for k, v in sorted(dist.items(), key = lambda item : item[1])]
 elif option == 'lda':
     lda_reload = pk.load(open(dumpfile,'rb'))
     X_reduced = lda_reload.transform(X)
     fea1 = X_reduced[f2i[gestureselect]]
     for gesture2, fea2 in enumerate(X_reduced):
-        dist[i2f[gesture2]] = spatial.distance.euclidean(fea1, fea2)
+        dist[i2f[gesture2]] = spatial.distance.cosine(fea1, fea2)
     dist = [(k, v) for k, v in sorted(dist.items(), key = lambda item : item[1])]
 elif option == 'ed' or option == 'dtw':
     datakey = 'winsymb' if option == 'ed' else 'winavg'
