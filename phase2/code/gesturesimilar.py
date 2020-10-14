@@ -4,7 +4,7 @@ import numpy as np
 import math
 import json
 import ast
-from sets import Set
+#from sets import Set
 import pickle as pk
 from sklearn.decomposition import PCA
 from sklearn.decomposition import TruncatedSVD
@@ -38,8 +38,8 @@ else:
 with open(filename) as json_file:
     vec = json.load(json_file)
 
-wordset = Set()
-gestureset = Set()
+wordset = set()
+gestureset = set()
 # example line in vector file:   "('23', u'Y', u'11', u'[6, 6, 7]')": 0.0009615384615384616, 
 for key, value in vec.items():
     li = ast.literal_eval(key)

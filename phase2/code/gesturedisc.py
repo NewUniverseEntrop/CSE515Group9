@@ -6,7 +6,7 @@ import json
 import csv
 import ast
 from collections import Counter
-from sets import Set
+#from sets import Set
 import pickle as pk
 from sklearn.decomposition import PCA
 from sklearn.decomposition import TruncatedSVD
@@ -41,8 +41,8 @@ else:
 with open(filename) as json_file:
     vec = json.load(json_file)
 
-wordset = Set()
-gestureset = Set()
+wordset = set()
+gestureset = set()
 
 for key, value in vec.items():
     li = ast.literal_eval(key)
@@ -136,12 +136,11 @@ if option == 'ed' or option == 'dtw':
     scale = mx - mn
     distmatrix = [[1 - (ele - mn) / scale for ele in row] for row in distmatrix]
 
-writer = csv.writer(open(vecoption + option + 'simi.csv', "wb"))
-for line in distmatrix:
-    writer.writerow(line)
-
+# decomposition using SVD
 u,s,v = np.linalg.svd(distmatrix)
 print(len(u), len(u[0]))
 print(u[:, 0 : topp])
 print(s)
 print([np.argmax(a) for a in u[ :, 0 : topp]])
+
+# decomposition using NMF

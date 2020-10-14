@@ -56,4 +56,8 @@ for filename in documents:
                     #symbo = 1 if symbo == 0 else symbo
                     result[component][idx]['winavg'][i] = statistics.mean(digi[i : i + w])    # average quantized amplitude
     with open("../" + str(fn) + ".wrd","w") as f:
-        json.dump(result,f,indent=2)
+        def convert(o):
+            if isinstance(o, np.int64):
+                return int(o)
+            raise TypeError
+        json.dump(result,f,indent=2, default=convert)
