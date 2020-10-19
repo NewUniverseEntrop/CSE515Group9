@@ -21,6 +21,9 @@ seg = [float(e) / r for e in range(-r, r + 1)]
 l = integrate.quad(gaussian, -1, 1, args = (0.25, 0))[0]
 # construct the quantization bins
 bins = np.array([integrate.quad(gaussian, -1, s, args = (0.25, 0))[0] / l * 2 - 1 for s in seg])
+sym2mid = {}
+for idx in range(1, len(bins)):
+    sym2mid[idx] = (bins[idx - 1] + bins[idx]) / 2
 
 documents = []
 components = ['W', 'X', 'Y', 'Z']
@@ -54,7 +57,8 @@ for filename in documents:
                     result[component][idx]['winsymb'][i] = str(digi[i : i + w]) # average quantized amplitude
                     #symbo = np.digitize(statistics.mean(pos[i : i + w]), bins, True)
                     #symbo = 1 if symbo == 0 else symbo
-                    result[component][idx]['winavg'][i] = statistics.mean(digi[i : i + w])    # average quantized amplitude
+                    # result[component][idx]['winavg'][i] = statistics.mean(digi[i : i + w])    # average quantized amplitude
+                    result[component][idx]['winavg'][i] = statistics.mean([sym2mid[digi[sym]] for sym in range(i, i + w)])
     with open("../" + str(fn) + ".wrd","w") as f:
         def convert(o):
             if isinstance(o, np.int64):

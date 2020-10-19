@@ -43,11 +43,15 @@ for k, v in idf.items():
     idf[k] = np.log(float(filecnt) / float(v))
 
 # TF-IDF is TF x IDF
+tf_copy = OrderedDict()
 tfidf = OrderedDict()
 for k, v in tf.items():
+    tf_copy[str(k)] = tf[k]
     tfidf[str(k)] = v * idf[(k[1], k[2], k[3])]
 
 # make the keys strings, for dumping to JSON
+'''
+RuntimeError: OrderedDict mutated during iteration in Python 3
 for key in tf.keys():
     if type(key) is not str:
         try:
@@ -58,9 +62,10 @@ for key in tf.keys():
             except:
                 pass
         del tf[key]
+'''
 
 with open("tf.txt","w") as f:
-    json.dump(tf, f, indent=2)
+    json.dump(tf_copy, f, indent=2)
 
 with open("tfidf.txt","w") as f:
     json.dump(tfidf, f, indent=2)

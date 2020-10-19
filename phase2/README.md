@@ -44,6 +44,7 @@ python gesturesimilar.py ../3_class_gesture_data 249 'tfidf' 'pca'
 * path
 * vector model: tf, tfidf
 * option: dotp, pca, svd, nmf, lda, ed, dtw
+* topp
 ```
-python gesturedisc.py ../3_class_gesture_data 'tfidf' 'pca'
+python gesturedisc.py ../3_class_gesture_data 'tfidf' 'pca' 3
 ```
