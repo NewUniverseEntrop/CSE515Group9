@@ -15,11 +15,16 @@ from sklearn.decomposition import LatentDirichletAllocation
 from sklearn.preprocessing import normalize
 from scipy import spatial
 from gestureeddtw import *
+import pandas as pd
+import numpy as np
+from sklearn.decomposition import NMF
+from sklearn.utils.extmath import randomized_svd
 
 folder = sys.argv[1]
 vecoption = sys.argv[2] # tf, tfidf
 option = sys.argv[3]    # dotp, pca, svd, nmf, lda, ed, dtw
 topp = int(sys.argv[4])
+decompostion = sys.argv[5]
 
 os.chdir(folder)
 
@@ -69,6 +74,8 @@ print(len(features), len(features[0]))
 X = np.array(features)
 
 distmatrix = [[0.0] * len(f2i) for _ in range(len(f2i))]
+print(distmatrix)
+
 dumpfile = vecoption + option + ".pkl"
 if option == 'dotp':
     for i in range(len(f2i)):
@@ -135,12 +142,53 @@ if option == 'ed' or option == 'dtw':
     mx, mn = max(max(distmatrix)), min(min(distmatrix))
     scale = mx - mn
     distmatrix = [[1 - (ele - mn) / scale for ele in row] for row in distmatrix]
+print("dist",np.array(distmatrix).shape)
 
-# decomposition using SVD
-u,s,v = np.linalg.svd(distmatrix)
-print(len(u), len(u[0]))
-print(u[:, 0 : topp])
-print(s)
-print([np.argmax(a) for a in u[ :, 0 : topp]])
+def getWordScoreMatrixForLatentFeature(word_score_df,i2w):
+    column_names = []
+    for index,word in  i2w.items():
+        column_names.append(str(word))
+    df = pd.DataFrame([word_score_df.T.to_numpy()], columns=column_names)
+    output_df = df.T.sort_values(by=0,ascending=False)
+    return output_df.T
 
-# decomposition using NMF
+def getLatentFeaturesAsWordScore(components,latent_features_file,topk):
+    print(components.shape)
+    word_score_df = pd.DataFrame(components)
+
+    for i in range(topk):
+        latent_df = getWordScoreMatrixForLatentFeature(word_score_df.iloc[i], i2f)
+        latent_df.to_csv(latent_features_file + "." + str(i) + ".csv")
+        print(latent_df)
+
+def svd(distmatrix):
+    # decomposition using SVD
+    latent_features_file = folder + '/' + vecoption + "." + option + "." + decompostion
+    print("sim matrix",len(distmatrix), len(distmatrix[0]))
+    u,s,v = np.linalg.svd(distmatrix)
+    print("SVD")
+    print(v[:topp])
+    print(v[0])
+    getLatentFeaturesAsWordScore(v[:topp], latent_features_file, topp)
+    # print("u",len(u), len(u[0]))
+    # print("top",u[:, 0 : topp])
+    # print("s",s)
+    # print([np.argmax(a) for a in u[ :, 0 : topp]])
+
+
+def nmf(distmatrix):
+    # decomposition using NMF
+
+    # normalized_sim_matrix = (distmatrix - np.min(distmatrix))/np.ptp(distmatrix)
+    latent_features_file = folder + '/' + vecoption + "." + option + "." + decompostion
+    model = NMF(n_components=topp, init='random', random_state=0)
+    model.fit(distmatrix)
+    H = model.components_
+    getLatentFeaturesAsWordScore(H, latent_features_file, topp)
+    print(H)
+
+
+if decompostion == 'svd':
+    svd(distmatrix)
+else:
+    nmf(distmatrix)
