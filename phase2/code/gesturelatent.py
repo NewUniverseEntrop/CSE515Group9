@@ -4,7 +4,6 @@ from sklearn.decomposition import NMF
 from sklearn.decomposition import LatentDirichletAllocation
 import sys
 import numpy as np
-import pandas as pd
 import json
 import ast
 #from sets import Set
@@ -35,10 +34,8 @@ for key, value in vec.items():
     wordset.add((li[1], li[2], li[3]))  # component + sensor + symbolic descriptor
 
 w2i = {} # map from word to index
-i2w = {}  # map from index to word
 for idx, word in enumerate(wordset):
     w2i[word] = idx
-    i2w[idx] = word
 
 gesturelist = sorted([int(v) for v in gestureset])
 f2i = {} # map from document to index
@@ -53,53 +50,27 @@ for key, val in vec.items():
     li = ast.literal_eval(key)
     features[f2i[li[0]]][w2i[(li[1], li[2], li[3])]] = val
 
-print(features)
 X = np.array(features)
-print(X)
-
-
-def getWordScoreMatrixForLatentFeature(word_score_df,i2w):
-    column_names = []
-    for index,word in  i2w.items():
-        column_names.append(str(word))
-    df = pd.DataFrame([word_score_df.T.to_numpy()], columns=column_names)
-    output_df = df.T.sort_values(by=0,ascending=False)
-    return output_df.T
-
-def getLatentFeaturesAsWordScore(components,latent_features_file):
-    print(components.shape)
-    word_score_df = pd.DataFrame(components)
-
-    for i in range(topk):
-        latent_df = getWordScoreMatrixForLatentFeature(word_score_df.iloc[i], i2w)
-        latent_df.to_csv(latent_features_file + "." + str(i) + ".csv")
-        print(latent_df)
-
-
-
 dumppath = folder + '/' + vecoption + option + ".pkl"
-
-latent_features_file = folder + '/' + vecoption + "." + option
 if option == 'pca':
     pca = PCA(n_components = topk)
     pca.fit(X)
-    getLatentFeaturesAsWordScore(pca.components_,latent_features_file)
+    print(pca.components_)
+    print(pca.explained_variance_ratio_)
     pk.dump(pca, open(dumppath,"wb"))
+    # X_reduced = pca.transform(X)
+    # print(X_reduced)
 elif option == 'svd':
     svd = TruncatedSVD(n_components=topk)
     svd.fit(X)
-    getLatentFeaturesAsWordScore(svd.components_,latent_features_file)
     pk.dump(svd, open(dumppath,"wb"))
 elif option == 'nmf':
     nmf = NMF(n_components=topk)
     nmf.fit(X)
-    getLatentFeaturesAsWordScore(nmf.components_,latent_features_file)
     pk.dump(nmf, open(dumppath,"wb"))
 elif option == 'lda':
-    lda = LatentDirichletAllocation(n_components=topk,max_iter=10)
+    lda = LatentDirichletAllocation(n_components=topk)
     lda.fit(X)
-    print(lda.components_)
-    getLatentFeaturesAsWordScore(lda.components_,latent_features_file)
     pk.dump(lda, open(dumppath,"wb"))
 else:
     print('wrong decomposition option')
