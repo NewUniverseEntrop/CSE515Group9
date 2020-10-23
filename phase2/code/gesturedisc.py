@@ -19,12 +19,12 @@ import pandas as pd
 import numpy as np
 from sklearn.decomposition import NMF
 from sklearn.utils.extmath import randomized_svd
-
+from kmeans import runKmeanClustering
 folder = sys.argv[1]
 vecoption = sys.argv[2] # tf, tfidf
 option = sys.argv[3]    # dotp, pca, svd, nmf, lda, ed, dtw
 topp = int(sys.argv[4])
-decompostion = sys.argv[5]
+grouping_strategy = sys.argv[5]
 
 os.chdir(folder)
 
@@ -180,7 +180,7 @@ def getLatentFeaturesAsWordScore(components,latent_features_file,topk):
 
 def svd(distmatrix):
     # decomposition using SVD
-    latent_features_file = folder + '/' + vecoption + "." + option + "." + decompostion
+    latent_features_file = folder + '/' + vecoption + "." + option + "." + grouping_strategy
     print("sim matrix",len(distmatrix), len(distmatrix[0]))
     u,s,v = np.linalg.svd(distmatrix)
     print("SVD")
@@ -200,9 +200,7 @@ def svd(distmatrix):
 
 def nmf(distmatrix):
     # decomposition using NMF
-
-    # normalized_sim_matrix = (distmatrix - np.min(distmatrix))/np.ptp(distmatrix)
-    latent_features_file = folder + '/' + vecoption + "." + option + "." + decompostion
+    latent_features_file = folder + '/' + vecoption + "." + option + "." + grouping_strategy
     model = NMF(n_components=topp, init='random', random_state=0)
     W = model.fit_transform(distmatrix)
     H = model.components_
@@ -217,7 +215,18 @@ def nmf(distmatrix):
     getLatentFeaturesAsWordScore(H, latent_features_file, topp)
 
 
-if decompostion == 'svd':
+if grouping_strategy == 'svd':
     svd(distmatrix)
-else:
+elif grouping_strategy == 'nmf':
     nmf(distmatrix)
+elif grouping_strategy == 'kmeans':
+    membership_indices_map = runKmeanClustering(np.array(distmatrix),topp,2)
+    membership = {}
+    for i in range(topp):
+        membership[i] = []
+    for key,value in membership_indices_map.items():
+        print(key)
+        for i in value:
+            membership[key].append(i2f[i])
+
+    print(membership)
