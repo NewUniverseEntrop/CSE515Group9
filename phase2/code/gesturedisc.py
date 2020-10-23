@@ -116,7 +116,24 @@ elif option == 'lda':
             fea2 = X_reduced[j]
             distmatrix[i][j] = distmatrix[j][i] = 1 - spatial.distance.cosine(fea1, fea2)
 elif option == 'ed':
-    pass
+    datakey = 'winsymb'
+    for i in range(len(f2i)):
+        gesture1 = words[i2f[i]]
+        for j in range(i, len(f2i)):
+            gesture2 = words[i2f[j]]
+            series1 = []
+            series2 = []
+            avg1, avg2 = [], []
+            std1, std2 = [], []
+            for component, data in gesture2.items():
+                for sensor, wins in data.items():
+                    series2.append([ast.literal_eval(v) for k, v in sorted(wins[datakey].items(), key=lambda item: int(item[0]))])
+                    series1.append([ast.literal_eval(v) for k, v in sorted(gesture1[component][sensor][datakey].items(), key=lambda item: int(item[0]))])
+                    avg1.append(gesture1[component][sensor]['avg'])
+                    avg2.append(wins['avg'])
+                    std1.append(gesture1[component][sensor]['std'])
+                    std2.append(wins['std'])
+            distmatrix[i][j] = distmatrix[j][i] = editdist(series1, series2, avg1, avg2, std1, std2)
 elif option == 'dtw':
     datakey = 'winavg'
     for i in range(len(f2i)):
