@@ -159,7 +159,7 @@ def getLatentFeaturesAsWordScore(components,latent_features_file,topk):
     for i in range(topk):
         latent_df = getWordScoreMatrixForLatentFeature(word_score_df.iloc[i], i2f)
         latent_df.to_csv(latent_features_file + "." + str(i) + ".csv")
-        print(latent_df)
+        # print(latent_df)
 
 def svd(distmatrix):
     # decomposition using SVD
@@ -168,12 +168,17 @@ def svd(distmatrix):
     u,s,v = np.linalg.svd(distmatrix)
     print("SVD")
     print(v[:topp])
-    print(v[0])
     getLatentFeaturesAsWordScore(v[:topp], latent_features_file, topp)
     # print("u",len(u), len(u[0]))
     # print("top",u[:, 0 : topp])
     # print("s",s)
-    # print([np.argmax(a) for a in u[ :, 0 : topp]])
+    print([np.argmax(a) for a in u[ :, 0 : topp]])
+    membership = {}
+    for i in range(topp):
+        membership[i] = []
+    for index,a in enumerate(u[:, 0: topp]):
+        membership[np.argmax(a)].append(i2f[index])
+    print(membership)
 
 
 def nmf(distmatrix):
@@ -182,10 +187,17 @@ def nmf(distmatrix):
     # normalized_sim_matrix = (distmatrix - np.min(distmatrix))/np.ptp(distmatrix)
     latent_features_file = folder + '/' + vecoption + "." + option + "." + decompostion
     model = NMF(n_components=topp, init='random', random_state=0)
-    model.fit(distmatrix)
+    W = model.fit_transform(distmatrix)
     H = model.components_
+    print(W)
+    print([np.argmax(a) for a in W])
+    membership = {}
+    for i in range(topp):
+        membership[i] = []
+    for index, a in enumerate(W):
+        membership[np.argmax(a)].append(i2f[index])
+    print(membership)
     getLatentFeaturesAsWordScore(H, latent_features_file, topp)
-    print(H)
 
 
 if decompostion == 'svd':
