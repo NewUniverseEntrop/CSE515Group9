@@ -20,6 +20,7 @@ import numpy as np
 from sklearn.decomposition import NMF
 from sklearn.utils.extmath import randomized_svd
 from kmeans import runKmeanClustering
+from gestureclusterlaplacian import gesturecluster
 folder = sys.argv[1]
 vecoption = sys.argv[2] # tf, tfidf
 option = sys.argv[3]    # dotp, pca, svd, nmf, lda, ed, dtw
@@ -224,6 +225,14 @@ def kmeans(distmatrix):  #task 4c
         for i in value:
             membership[key].append(i2f[i])
     print(membership)
+def specteral_clustering(distmatrix):
+    labels = gesturecluster(np.array(distmatrix), topp)
+    membership = {}
+    for i in range(topp):
+        membership[i] = []
+    for i,label in enumerate(labels):
+        membership[label].append(i2f[i])
+    print(membership)
 
 if grouping_strategy == 'svd':
     svd(distmatrix)
@@ -231,3 +240,5 @@ elif grouping_strategy == 'nmf':
     nmf(distmatrix)
 elif grouping_strategy == 'kmeans':
     kmeans(distmatrix)
+elif grouping_strategy == 'spectral':
+    specteral_clustering(distmatrix)

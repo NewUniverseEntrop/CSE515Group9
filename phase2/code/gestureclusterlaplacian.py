@@ -6,35 +6,35 @@ import networkx
 import random
 from scipy.sparse.linalg import eigs
 
-folder = sys.argv[1]
-option = sys.argv[2]  # dot PCA SVD NMF LDA edit DTW
-
-if option == '1':
-    print()
-elif option == 2:
-    print()
-elif option == 3:
-    print()
-elif option == 4:
-    print()
-elif option == 5:
-    print()
-elif option == 6:
-    print()
-elif option == 7:
-    print()
-else:
-    print('wrong clustering option')
-
-testmatrix = np.zeros((10, 10))
-for i in range(len(testmatrix) // 2):
-    for j in range(len(testmatrix) // 2):
-        testmatrix[i, j] = 1
-        testmatrix[j, i] = 1
-for i in range(len(testmatrix) // 2, len(testmatrix)):
-    for j in range(len(testmatrix) // 2, len(testmatrix)):
-        testmatrix[i, j] = 1
-        testmatrix[j, i] = 1
+# folder = sys.argv[1]
+# option = sys.argv[2]  # dot PCA SVD NMF LDA edit DTW
+#
+# if option == '1':
+#     print()
+# elif option == 2:
+#     print()
+# elif option == 3:
+#     print()
+# elif option == 4:
+#     print()
+# elif option == 5:
+#     print()
+# elif option == 6:
+#     print()
+# elif option == 7:
+#     print()
+# else:
+#     print('wrong clustering option')
+#
+# testmatrix = np.zeros((10, 10))
+# for i in range(len(testmatrix) // 2):
+#     for j in range(len(testmatrix) // 2):
+#         testmatrix[i, j] = 1
+#         testmatrix[j, i] = 1
+# for i in range(len(testmatrix) // 2, len(testmatrix)):
+#     for j in range(len(testmatrix) // 2, len(testmatrix)):
+#         testmatrix[i, j] = 1
+#         testmatrix[j, i] = 1
 
 
 #print(testmatrix)
@@ -57,8 +57,8 @@ def gesturecluster(matrix, k=2):
     V = abs(np.mat(kvecs))  # k*n matrix for cluster
     kmeans = KMeans(n_clusters=k, random_state=0).fit(V)
     clusterresult = kmeans.labels_
-    #print(clusterresult)
+    print(clusterresult)
     return clusterresult
 
 
-gesturecluster(testmatrix, 2)  # for debugging only, no real meaning
+# gesturecluster(testmatrix, 2)  # for debugging only, no real meaning
