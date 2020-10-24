@@ -105,7 +105,7 @@ def performClustering(points, k, strategy=2):
         cost = new_cost
         centers = new_centers
 
-    print(filegroupsMap)
+    # print(filegroupsMap)
     return filegroupsMap
 
 

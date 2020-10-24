@@ -44,12 +44,12 @@ from kmeans import performClustering
 #     for j in range(len(testmatrix) // 4 * 3, len(testmatrix)):
 #         testmatrix[i, j] = 1
 #         testmatrix[j, i] = 1
-#
-#
+
+
 # print(testmatrix)
 
 
-def gesturecluster(matrix, k=2):
+def gesture_spectral_cluster(matrix, k=2):
     if not matrix.shape[0] == matrix.shape[1]:
         print('matrix is not a square')
     W = np.matrix(matrix)
@@ -58,11 +58,10 @@ def gesturecluster(matrix, k=2):
     kvals, kvecs = eigs(Lsym, k, which = 'SM')
     V = np.mat(kvecs).real  # n*k matrix for cluster
     # kmeans = KMeans(n_clusters=k, random_state=0).fit(V)
-    membershipMap = performClustering(V,4,2)
+    membershipMap = performClustering(V,k,1)
     print(membershipMap)
     # clusterresult = kmeans.labels_
-    # print(clusterresult)
     return membershipMap
 
 
-# gesturecluster(testmatrix, 4)  # for debugging only, no real meaning
+# gesture_spectral_cluster(testmatrix, 4)  # for debugging only, no real meaning

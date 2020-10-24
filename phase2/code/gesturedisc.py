@@ -20,7 +20,7 @@ import numpy as np
 from sklearn.decomposition import NMF
 from sklearn.utils.extmath import randomized_svd
 from kmeans import performClustering
-from gestureclusterlaplacian import gesturecluster
+from gestureclusterlaplacian import gesture_spectral_cluster
 folder = sys.argv[1]
 vecoption = sys.argv[2] # tf, tfidf
 option = sys.argv[3]    # dotp, pca, svd, nmf, lda, ed, dtw
@@ -229,7 +229,7 @@ def kmeans(distmatrix):  #task 4c
             membership[i].append(i2f[file_index])
     print(membership)
 def specteral_clustering(distmatrix):
-    membership_indices_map = gesturecluster(np.array(distmatrix), topp)
+    membership_indices_map = gesture_spectral_cluster(np.array(distmatrix), topp)
     membership = {}
     for i in range(topp):
         membership[i] = []
