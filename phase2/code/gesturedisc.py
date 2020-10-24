@@ -19,12 +19,12 @@ import pandas as pd
 import numpy as np
 from sklearn.decomposition import NMF
 from sklearn.utils.extmath import randomized_svd
-
+from kmeans import runKmeanClustering
 folder = sys.argv[1]
 vecoption = sys.argv[2] # tf, tfidf
 option = sys.argv[3]    # dotp, pca, svd, nmf, lda, ed, dtw
 topp = int(sys.argv[4])
-decompostion = sys.argv[5]
+grouping_strategy = sys.argv[5]
 
 os.chdir(folder)
 
@@ -121,6 +121,7 @@ elif option == 'ed':
         gesture1 = words[i2f[i]]
         for j in range(i, len(f2i)):
             gesture2 = words[i2f[j]]
+            print(i, j)
             series1 = []
             series2 = []
             avg1, avg2 = [], []
@@ -180,17 +181,17 @@ def getLatentFeaturesAsWordScore(components,latent_features_file,topk):
 
 def svd(distmatrix):
     # decomposition using SVD
-    latent_features_file = folder + '/' + vecoption + "." + option + "." + decompostion
+    latent_features_file = folder + '/' + vecoption + "." + option + "." + grouping_strategy
     print("sim matrix",len(distmatrix), len(distmatrix[0]))
     u,s,v = np.linalg.svd(distmatrix)
     print("SVD")
     print(v[:topp])
-    getLatentFeaturesAsWordScore(v[:topp], latent_features_file, topp)
+    getLatentFeaturesAsWordScore(v[:topp], latent_features_file, topp)  #task3a
     # print("u",len(u), len(u[0]))
     # print("top",u[:, 0 : topp])
     # print("s",s)
     print([np.argmax(a) for a in u[ :, 0 : topp]])
-    membership = {}
+    membership = {}  #task 4a
     for i in range(topp):
         membership[i] = []
     for index,a in enumerate(u[:, 0: topp]):
@@ -200,24 +201,33 @@ def svd(distmatrix):
 
 def nmf(distmatrix):
     # decomposition using NMF
-
-    # normalized_sim_matrix = (distmatrix - np.min(distmatrix))/np.ptp(distmatrix)
-    latent_features_file = folder + '/' + vecoption + "." + option + "." + decompostion
+    latent_features_file = folder + '/' + vecoption + "." + option + "." + grouping_strategy
     model = NMF(n_components=topp, init='random', random_state=0)
     W = model.fit_transform(distmatrix)
     H = model.components_
     print(W)
+    getLatentFeaturesAsWordScore(H, latent_features_file, topp)  #task3b
     print([np.argmax(a) for a in W])
-    membership = {}
+    membership = {}  #task 4b
     for i in range(topp):
         membership[i] = []
     for index, a in enumerate(W):
         membership[np.argmax(a)].append(i2f[index])
     print(membership)
-    getLatentFeaturesAsWordScore(H, latent_features_file, topp)
 
+def kmeans(distmatrix):  #task 4c
+    membership_indices_map = runKmeanClustering(np.array(distmatrix), topp, 2)
+    membership = {}
+    for i in range(topp):
+        membership[i] = []
+    for key, value in membership_indices_map.items():
+        for i in value:
+            membership[key].append(i2f[i])
+    print(membership)
 
-if decompostion == 'svd':
+if grouping_strategy == 'svd':
     svd(distmatrix)
-else:
+elif grouping_strategy == 'nmf':
     nmf(distmatrix)
+elif grouping_strategy == 'kmeans':
+    kmeans(distmatrix)
