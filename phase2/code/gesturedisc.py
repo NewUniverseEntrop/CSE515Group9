@@ -121,6 +121,7 @@ elif option == 'ed':
         gesture1 = words[i2f[i]]
         for j in range(i, len(f2i)):
             gesture2 = words[i2f[j]]
+            print(i, j)
             series1 = []
             series2 = []
             avg1, avg2 = [], []
@@ -185,12 +186,12 @@ def svd(distmatrix):
     u,s,v = np.linalg.svd(distmatrix)
     print("SVD")
     print(v[:topp])
-    getLatentFeaturesAsWordScore(v[:topp], latent_features_file, topp)
+    getLatentFeaturesAsWordScore(v[:topp], latent_features_file, topp)  #task3a
     # print("u",len(u), len(u[0]))
     # print("top",u[:, 0 : topp])
     # print("s",s)
     print([np.argmax(a) for a in u[ :, 0 : topp]])
-    membership = {}
+    membership = {}  #task 4a
     for i in range(topp):
         membership[i] = []
     for index,a in enumerate(u[:, 0: topp]):
@@ -205,28 +206,28 @@ def nmf(distmatrix):
     W = model.fit_transform(distmatrix)
     H = model.components_
     print(W)
+    getLatentFeaturesAsWordScore(H, latent_features_file, topp)  #task3b
     print([np.argmax(a) for a in W])
-    membership = {}
+    membership = {}  #task 4b
     for i in range(topp):
         membership[i] = []
     for index, a in enumerate(W):
         membership[np.argmax(a)].append(i2f[index])
     print(membership)
-    getLatentFeaturesAsWordScore(H, latent_features_file, topp)
 
+def kmeans(distmatrix):  #task 4c
+    membership_indices_map = runKmeanClustering(np.array(distmatrix), topp, 2)
+    membership = {}
+    for i in range(topp):
+        membership[i] = []
+    for key, value in membership_indices_map.items():
+        for i in value:
+            membership[key].append(i2f[i])
+    print(membership)
 
 if grouping_strategy == 'svd':
     svd(distmatrix)
 elif grouping_strategy == 'nmf':
     nmf(distmatrix)
 elif grouping_strategy == 'kmeans':
-    membership_indices_map = runKmeanClustering(np.array(distmatrix),topp,2)
-    membership = {}
-    for i in range(topp):
-        membership[i] = []
-    for key,value in membership_indices_map.items():
-        print(key)
-        for i in value:
-            membership[key].append(i2f[i])
-
-    print(membership)
+    kmeans(distmatrix)
