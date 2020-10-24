@@ -217,22 +217,20 @@ def nmf(distmatrix):
     print(membership)
 
 def kmeans(distmatrix):  #task 4c
-    membership_indices_map = performClustering(np.array(distmatrix), topp, 2)
+    membership_indices_map = performClustering(np.array(distmatrix), topp, 1)
     membership = {}
     for i in range(topp):
         membership[i] = []
-    for key, value in membership_indices_map.items():
-        for i in value:
-            membership[key].append(i2f[i])
+        for file_index in membership_indices_map[i]:
+            membership[i].append(i2f[file_index])
     print(membership)
 def specteral_clustering(distmatrix):
     membership_indices_map = gesturecluster(np.array(distmatrix), topp)
     membership = {}
     for i in range(topp):
         membership[i] = []
-    for key, value in membership_indices_map.items():
-        for i in value:
-            membership[key].append(i2f[i])
+        for file_index in membership_indices_map[i]:
+            membership[i].append(i2f[file_index])
     print(membership)
 
 if grouping_strategy == 'svd':
