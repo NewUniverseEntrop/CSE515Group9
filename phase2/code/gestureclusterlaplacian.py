@@ -6,7 +6,7 @@ import numpy as np
 import networkx
 import random
 from scipy.sparse.linalg import eigs
-
+from kmeans import performClustering
 # folder = sys.argv[1]
 # option = sys.argv[2]  # dot PCA SVD NMF LDA edit DTW
 #
@@ -43,9 +43,9 @@ from scipy.sparse.linalg import eigs
 # for i in range(len(testmatrix) // 4 * 3, len(testmatrix)):
 #     for j in range(len(testmatrix) // 4 * 3, len(testmatrix)):
 #         testmatrix[i, j] = 1
-#         testmatrix[j, i] = 1 
-
-
+#         testmatrix[j, i] = 1
+#
+#
 # print(testmatrix)
 
 
@@ -57,10 +57,12 @@ def gesturecluster(matrix, k=2):
     Lsym = np.identity(W.shape[0]) - D2 * W * D2
     kvals, kvecs = eigs(Lsym, k, which = 'SM')
     V = np.mat(kvecs).real  # n*k matrix for cluster
-    kmeans = KMeans(n_clusters=k, random_state=0).fit(V)
-    clusterresult = kmeans.labels_
-    print(clusterresult)
-    return clusterresult
+    # kmeans = KMeans(n_clusters=k, random_state=0).fit(V)
+    membershipMap = performClustering(V,4,2)
+    print(membershipMap)
+    # clusterresult = kmeans.labels_
+    # print(clusterresult)
+    return membershipMap
 
 
 # gesturecluster(testmatrix, 4)  # for debugging only, no real meaning

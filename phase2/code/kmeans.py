@@ -1,119 +1,114 @@
-import numpy as np
+import numpy as nump
 import random
 
-def randomCentroids(samples,k):  # pick k centroids from samples randomly strategy 1
-    centeroids = []
-    size = len(samples)
+def init1(points, k):
+    centers = []
+    size = len(points)
     for i in range(0, k):
         n = random.randint(0, size - 1)
-        centeroids.append(samples[n])
-    return centeroids
+        centers.append(points[n])
+    return centers
 
-def pickCentroidsMethod2(samples,k): # pick k centroids using strategy 2
-    centeroids = []
-    size = len(samples)
-    firstCentroid = random.randint(0, size - 1)  #pick first centroid randomly
-    # print(firstCentroid, samples[firstCentroid], len(samples))
-    centeroids.append(samples[firstCentroid])
+def init2(points, k):
+    centers = []
+    size = len(points)
+    firstCentroid = random.randint(0, size - 1)
+    centers.append(points[firstCentroid])
     for i in range(1,k):
-        index = pickFarthestCentroid(centeroids,samples) # pick sample whose avg distance from 0...i-1 centroid is max
-        # print(index,samples[index],len(samples))
-        centeroids.append(samples[index])
-    return centeroids
+        index = getMostAwayCenter(centers, points)
+        centers.append(points[index])
+    return centers
 
-def ifSampleisCenteroid(centeroids,sample): # ignore if sample itself is centroid
+def ifSampleisCenteroid(centeroids,sample):
     for centeroid in centeroids:
-        if all(centeroid == sample):
+        if (centeroid == sample).all():
             return bool(1)
     return bool(0)
-def pickFarthestCentroid(centeroids,samples):  # pick sample whose avg distance from 0...i-1 centroid is max
-    new_samples = []
-    for sample in samples:
-        if not ifSampleisCenteroid(centeroids,sample):
-            new_samples.append(sample)
+def getMostAwayCenter(centers, points):
+    new_points = []
+    for point in points:
+        if not ifSampleisCenteroid(centers,point):
+            new_points.append(point)
     distances = []
-    for sample in new_samples:
+    for new_point in new_points:
         distance = 0
-        for centeroid in centeroids:
-            norm = np.linalg.norm(centeroid - sample)
+        for center in centers:
+            norm = nump.linalg.norm(center - new_point)
             distance += norm
-        distances.append(distance/len(centeroids))
+        distances.append(distance/len(centers))
     return distances.index(max(distances))
 
-def resetMembership(membershipMap,fileMembershipMap,k):
+def resetAll(groupsMap, filegroupsMap, k):
     for i in range(0,k):
-        membershipMap[i] = []
-        fileMembershipMap[i] = []
+        groupsMap[i] = []
+        filegroupsMap[i] = []
 
 
-def classifySample(sample,centeroids):  #function to classify sample to nearest centroid
+def assignGroup(sample, centeroids):
     distances = []
     for centeroid in centeroids:
-        norm = np.linalg.norm(centeroid-sample)
+        norm = nump.linalg.norm(centeroid - sample)
         distances.append(norm)
     i = distances.index(min(distances))
     return i
 
-def recomputeCentroids(samples,centeroids,membershipMap,filemembershipMap,k):  #computing new centroid after classifying samples to new centroid
+def regroup(points, centers, groupsMap, filegroupsMap, k):
 
-    new_centeroids = []
-    resetMembership(membershipMap,filemembershipMap,k)
-    for index,sample in enumerate(samples):
-        nearestCenteroid = classifySample(sample,centeroids)
-        membershipMap[nearestCenteroid].append(sample)
-        filemembershipMap[nearestCenteroid].append(index)
+    new_centers = []
+    resetAll(groupsMap, filegroupsMap, k)
+    for index,sample in enumerate(points):
+        nearestCenter = assignGroup(sample, centers)
+        groupsMap[nearestCenter].append(sample)
+        filegroupsMap[nearestCenter].append(index)
     for i in range(0,k):
-        members = membershipMap[i]
-        if len(members) == 0:  #no sample belong to this cluster
-            mean = centeroids[i]
+        members = groupsMap[i]
+        if len(members) == 0:
+            mean = centers[i]
         else:
-            mean = np.mean(members,axis=0)  # takinng mean of all samples to compute new centroid
-        new_centeroids.append(mean)
-    return new_centeroids
+            mean = nump.mean(members, axis=0)
+        new_centers.append(mean)
+    return new_centers
 
-def costFunction(centeroids,membershipMap):  # objective function calculation
-    variance = 0
-    for i in membershipMap:
-        centeroid = centeroids[i]
-        members = membershipMap[i]
-        for member in members:
-            norm = np.linalg.norm(centeroid-member)
-            variance = variance + norm*norm
-    return variance
+def costObjective(centers, groupsMap):  #cost
+    total = 0
+    for index in groupsMap:
+        center = centers[index]
+        members = groupsMap[index]
+        for x in members:
+            euclidena = nump.linalg.norm(center - x)
+            total = total + euclidena*euclidena
+    return total
 
-def runKmeanClustering(samples,k,strategy=1):
-    membershipMap = {}
-    fileMembershipMap = {}
-    centeroids = []
+def performClustering(points, k, strategy=2):
+    groupsMap = {}
+    filegroupsMap = {}
+    centers = []
     if strategy == 1:
-        centeroids = randomCentroids(samples,k)  #strategy 1
+        centers = init1(points, k)  #init 1
     else:
-        centeroids = pickCentroidsMethod2(samples,k)  # strategy 2
+        centers = init2(points, k)  # init 2
 
-    resetMembership(membershipMap,fileMembershipMap,k)
-    for index,sample in enumerate(samples):  # classifying each sample to nearest centroid
-        nearestCenteroid = classifySample(sample, centeroids)
-        membershipMap[nearestCenteroid].append(sample)
-        fileMembershipMap[nearestCenteroid].append(index)
+    resetAll(groupsMap, filegroupsMap, k)
+    for index,sample in enumerate(points):
+        nearestCenteroid = assignGroup(sample, centers)
+        groupsMap[nearestCenteroid].append(sample)
+        filegroupsMap[nearestCenteroid].append(index)
 
     end = bool(0)
-    cost = costFunction(centeroids,membershipMap)      # initial cost of objective function
+    cost = costObjective(centers, groupsMap)
     while not end and cost!=0 :
-        new_centeroids = recomputeCentroids(samples,centeroids,membershipMap,fileMembershipMap,k)  #recomputing centroids iteratively
-        new_cost = costFunction(new_centeroids,membershipMap)
-        delta_cost = (cost-new_cost)*100/cost  # relative change in cost in percent
-        if(delta_cost < 0.1):  # convergence condition until there is not change in centroids
+        new_centers = regroup(points, centers, groupsMap, filegroupsMap, k)
+        new_cost = costObjective(new_centers, groupsMap)
+        delta_cost = (cost-new_cost)*100/cost
+        if(delta_cost < 0.1):
             end = bool(1)
         cost = new_cost
-        centeroids = new_centeroids
+        centers = new_centers
 
-    # print(membershipMap)
-    print(fileMembershipMap)
-    # print(np.array(centeroids))
-    return fileMembershipMap
+    print(filegroupsMap)
+    return filegroupsMap
 
-# samples =  np.random.randint(low=0,high=10,size=(3,3))
+
+# samples = nump.array([[1, 1, 1], [2, 2, 2], [5, 5, 5], [6, 6, 6], [10, 9, 8], [11, 9, 9]])
 # print(samples)
-# samples = np.array([[1,1,1],[2,2,2],[5,5,5],[6,6,6],[10,9,8],[11,9,9]])
-# print(samples)
-# runKmeanClustering(samples,3)
+# performClustering(samples, 3)
