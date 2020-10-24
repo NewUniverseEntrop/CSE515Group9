@@ -1,6 +1,7 @@
 import sys
 from sklearn.neighbors import NearestNeighbors
 from sklearn.cluster import KMeans
+import math
 import numpy as np
 import networkx
 import random
@@ -26,39 +27,40 @@ from scipy.sparse.linalg import eigs
 # else:
 #     print('wrong clustering option')
 #
-# testmatrix = np.zeros((10, 10))
-# for i in range(len(testmatrix) // 2):
-#     for j in range(len(testmatrix) // 2):
+# testmatrix = np.zeros((16, 16))
+# for i in range(len(testmatrix) // 4):
+#     for j in range(len(testmatrix) // 4):
 #         testmatrix[i, j] = 1
 #         testmatrix[j, i] = 1
-# for i in range(len(testmatrix) // 2, len(testmatrix)):
-#     for j in range(len(testmatrix) // 2, len(testmatrix)):
+# for i in range(len(testmatrix) // 4, len(testmatrix) // 2):
+#     for j in range(len(testmatrix) // 4, len(testmatrix) // 2):
 #         testmatrix[i, j] = 1
 #         testmatrix[j, i] = 1
+# for i in range(len(testmatrix) // 2, len(testmatrix) // 4 * 3):
+#     for j in range(len(testmatrix) // 2, len(testmatrix) // 4 * 3):
+#         testmatrix[i, j] = 1
+#         testmatrix[j, i] = 1
+# for i in range(len(testmatrix) // 4 * 3, len(testmatrix)):
+#     for j in range(len(testmatrix) // 4 * 3, len(testmatrix)):
+#         testmatrix[i, j] = 1
+#         testmatrix[j, i] = 1 
 
 
-#print(testmatrix)
+# print(testmatrix)
 
 
 def gesturecluster(matrix, k=2):
     if not matrix.shape[0] == matrix.shape[1]:
         print('matrix is not a square')
-    G = networkx.Graph()
-    for i in range(len(matrix)):
-        G.add_node(str(i))
-    for i in range(len(matrix)):
-        #subvector = matrix[i, :]
-        #knearest = np.argpartition(subvector, -knear)[-knear - 1:-1]  # k nearest
-        for j in range(len(matrix)):
-            if matrix[i][j] > 0:  # graph weight need to be positive
-                G.add_edge(str(i), str(j), weight=matrix[i][j])  # build k-nearest graph
-    normalaplacian = networkx.normalized_laplacian_matrix(G)
-    kvals, kvecs = eigs(normalaplacian, k, which = 'SM')
-    V = abs(np.mat(kvecs))  # k*n matrix for cluster
+    W = np.matrix(matrix)
+    D2 = np.diag([math.sqrt(1 / sum(row)) for row in matrix])
+    Lsym = np.identity(W.shape[0]) - D2 * W * D2
+    kvals, kvecs = eigs(Lsym, k, which = 'SM')
+    V = np.mat(kvecs).real  # n*k matrix for cluster
     kmeans = KMeans(n_clusters=k, random_state=0).fit(V)
     clusterresult = kmeans.labels_
     print(clusterresult)
     return clusterresult
 
 
-# gesturecluster(testmatrix, 2)  # for debugging only, no real meaning
+# gesturecluster(testmatrix, 4)  # for debugging only, no real meaning
