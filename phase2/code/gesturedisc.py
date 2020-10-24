@@ -161,6 +161,10 @@ if option == 'ed' or option == 'dtw':
     mx, mn = max(max(distmatrix)), min(min(distmatrix))
     scale = mx - mn
     distmatrix = [[1 - (ele - mn) / scale for ele in row] for row in distmatrix]
+else:
+    mx, mn = max(max(distmatrix)), min(min(distmatrix))
+    scale = mx - mn
+    distmatrix = [[(ele - mn) / scale for ele in row] for row in distmatrix]
 print("dist",np.array(distmatrix).shape)
 
 def getWordScoreMatrixForLatentFeature(word_score_df,i2w):
