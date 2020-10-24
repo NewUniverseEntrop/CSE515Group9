@@ -54,7 +54,7 @@ def gesturecluster(matrix, k=2):
         print('matrix is not a square')
     W = np.matrix(matrix)
     D2 = np.diag([math.sqrt(1 / sum(row)) for row in matrix])
-    Lsym = np.identity(W.shape[0]) - D2 * W * D2
+    Lsym = np.identity(W.shape[0]) - D2.dot(W.dot(D2))
     kvals, kvecs = eigs(Lsym, k, which = 'SM')
     V = np.mat(kvecs).real  # n*k matrix for cluster
     kmeans = KMeans(n_clusters=k, random_state=0).fit(V)
