@@ -75,7 +75,7 @@ print(len(features), len(features[0]))
 X = np.array(features)
 
 distmatrix = [[0.0] * len(f2i) for _ in range(len(f2i))]
-print(distmatrix)
+# print(distmatrix)
 
 dumpfile = vecoption + option + ".pkl"
 if option == 'dotp':
@@ -165,6 +165,8 @@ else:
     mx, mn = max(max(distmatrix)), min(min(distmatrix))
     scale = mx - mn
     distmatrix = [[(ele - mn) / scale for ele in row] for row in distmatrix]
+
+distmatrix = [[0 if ele < 0 else ele for ele in row] for row in distmatrix]
 print("dist",np.array(distmatrix).shape)
 
 def getWordScoreMatrixForLatentFeature(word_score_df,i2w):
