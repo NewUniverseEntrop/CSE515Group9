@@ -34,7 +34,7 @@ python gesturelatent.py ../3_class_gesture_data 'tfidf' 20 'pca'
 ### Parameters:
 * path
 * query gesture
-* vector model: tf, tfidf
+* vector model: tf, tfidf; ignored if option is `ed' or `dtw'
 * option: dotp, pca, svd, nmf, lda, ed, dtw
 ```
 python gesturesimilar.py ../3_class_gesture_data 249 'tfidf' 'pca'
@@ -42,7 +42,7 @@ python gesturesimilar.py ../3_class_gesture_data 249 'tfidf' 'pca'
 ## Tasks 3 & 4
 ### Parameters:
 * path
-* vector model: tf, tfidf
+* vector model: tf, tfidf; ignored if option is `ed' or `dtw'
 * option: dotp, pca, svd, nmf, lda, ed, dtw
 * topp:  latent semantics to be extracted from the gestures; or cluster number of k-means and spectral clustering
 * grouping: grouping strategy, can be chosen from svd, nmf, kmeans, spectral
