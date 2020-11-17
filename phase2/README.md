@@ -6,8 +6,27 @@
 * Xin Xu xinxu11@asu.edu
 * Zhiheng Zhang zzhan339@asu.edu
 
-## Task 0a
-### Parameters:
+## Phase 3
+### Task 1
+### Task 2
+### Task 3: Multi-dimensional index structures and nearest neighbor search task:
+#### Parameters:
+* path
+* query gesture
+* vector model: tf, tfidf
+* option: use original vectors or dimension-reduced vectors; orig, pca, svd, nmf, lda
+* k: number of hash functions per layer
+* L: number of layers
+```
+python gesturelsh.py ../3_class_gesture_data 249 'tfidf' 'orig' 5 10
+```
+
+### Task 4
+### Task 5
+
+## Phase 2
+### Task 0a
+#### Parameters:
 * path
 * resolution
 * window size
@@ -15,14 +34,14 @@
 ```
 python gesturewords.py ../3_class_gesture_data/ 4 3 3
 ```
-## Task 0b
-### Parameters:
+### Task 0b
+#### Parameters:
 * path
 ```
 python gesturevectors.py ../3_class_gesture_data
 ```
-## Task 1
-### Parameters:
+### Task 1
+#### Parameters:
 * path
 * vector model: tf, tfidf
 * k: top-k latent semantics / topics
@@ -30,8 +49,8 @@ python gesturevectors.py ../3_class_gesture_data
 ```
 python gesturelatent.py ../3_class_gesture_data 'tfidf' 20 'pca'
 ```
-## Task 2
-### Parameters:
+### Task 2
+#### Parameters:
 * path
 * query gesture
 * vector model: tf, tfidf; ignored if option is `ed' or `dtw'
@@ -39,8 +58,8 @@ python gesturelatent.py ../3_class_gesture_data 'tfidf' 20 'pca'
 ```
 python gesturesimilar.py ../3_class_gesture_data 249 'tfidf' 'pca'
 ```
-## Tasks 3 & 4
-### Parameters:
+### Tasks 3 & 4
+#### Parameters:
 * path
 * vector model: tf, tfidf; ignored if option is `ed' or `dtw'
 * option: dotp, pca, svd, nmf, lda, ed, dtw
