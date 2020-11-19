@@ -66,12 +66,13 @@ for idx, finset in enumerate(gesturelist):
     f2i[str(finset)] = idx
     i2f[idx] = str(finset)
 
+print(i2f)
 # transform vector in dictionary to a matrix (row: word, column: file)
 features = [[0.0] * len(w2i) for i in range(len(f2i))]
 for key, val in vec.items():
     li = ast.literal_eval(key)
     features[f2i[li[0]]][w2i[(li[1], li[2], li[3])]] = val
-print(len(features), len(features[0]))
+# print(len(features), len(features[0]))
 X = np.array(features)
 
 distmatrix = [[0.0] * len(f2i) for _ in range(len(f2i))]
@@ -178,7 +179,7 @@ def getWordScoreMatrixForLatentFeature(word_score_df,i2w):
     return output_df.T
 
 def getLatentFeaturesAsWordScore(components,latent_features_file,topk):
-    print(components.shape)
+    # print(components.shape)
     word_score_df = pd.DataFrame(components)
 
     for i in range(topk):
@@ -189,15 +190,15 @@ def getLatentFeaturesAsWordScore(components,latent_features_file,topk):
 def svd(distmatrix):
     # decomposition using SVD
     latent_features_file = folder + '/' + vecoption + "." + option + "." + grouping_strategy
-    print("sim matrix",len(distmatrix), len(distmatrix[0]))
+    # print("sim matrix",len(distmatrix), len(distmatrix[0]))
     u,s,v = np.linalg.svd(distmatrix)
     print("SVD")
-    print(v[:topp])
+    # print(v[:topp])
     getLatentFeaturesAsWordScore(v[:topp], latent_features_file, topp)  #task3a
     # print("u",len(u), len(u[0]))
     # print("top",u[:, 0 : topp])
     # print("s",s)
-    print([np.argmax(a) for a in u[ :, 0 : topp]])
+    # print([np.argmax(a) for a in u[ :, 0 : topp]])
     membership = {}  #task 4a
     for i in range(topp):
         membership[i] = []
@@ -212,9 +213,9 @@ def nmf(distmatrix):
     model = NMF(n_components=topp, init='random', random_state=0)
     W = model.fit_transform(distmatrix)
     H = model.components_
-    print(W)
+    # print(W)
     getLatentFeaturesAsWordScore(H, latent_features_file, topp)  #task3b
-    print([np.argmax(a) for a in W])
+    # print([np.argmax(a) for a in W])
     membership = {}  #task 4b
     for i in range(topp):
         membership[i] = []
@@ -247,3 +248,18 @@ elif grouping_strategy == 'kmeans':
     kmeans(distmatrix)
 elif grouping_strategy == 'spectral':
     specteral_clustering(distmatrix)
+    
+sim_dump_file = 'similarity_matrix_' + option
+f2i_dump_file = 'f2i.dump'
+i2f_dump_file = 'i2f.dump'
+np.save(sim_dump_file,np.array(distmatrix))
+import json
+
+with open(f2i_dump_file, 'w') as fp:
+    json.dump(f2i, fp)
+with open(i2f_dump_file, 'w') as fp:
+    json.dump(i2f, fp)
+print(distmatrix)
+# with open("/Users/xavi/MWDB/xin/CSE515Group9/phase2/test.np","w") as f:
+#     json.dump(np.array(distmatrix).tolist(), f, indent=2)
+
