@@ -107,7 +107,7 @@ def run(command):
     if "task3" in command:    
         ## call date command ##
         p = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True)
-        (output, err) = p.communicate()
+        output, err = p.communicate()
         output=output.decode().rstrip().split(",")
         print("output",output)
         update(output) # update gui
@@ -161,12 +161,12 @@ ttk.Button(Controlframe,text="Run task 2",command=lambda :run("python task2.py "
 
 threelabel.grid(column=3, row=11, columnspan=2)
 threeentry.grid(column=3,row=12,columnspan=2)
-ttk.Button(Controlframe,text="Run task 3", command=lambda :run(threeentry.get())).grid(column=3,row=13,columnspan=2)
+ttk.Button(Controlframe,text="Run task 3", command=lambda :run("python task3.py"+threeentry.get())).grid(column=3,row=13,columnspan=2)
 
 
 fourLabel.grid(column=3, row=16)
 fourentry.grid(column=3, row=17)
-ttk.Button(Controlframe,text="Submit feedback with task 4", command=lambda :run(fourentry.get())).grid(column=3,row=18,columnspan=2)
+ttk.Button(Controlframe,text="Submit feedback with task 4", command=lambda :run("python task4.py"+fourentry.get())).grid(column=3,row=18,columnspan=2)
 
 fiveLabel.grid(column=3, row=19)
 fiveentry.grid(column=3,row=20)
