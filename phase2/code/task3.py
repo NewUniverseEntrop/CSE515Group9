@@ -1,9 +1,8 @@
 import sys
-import glob, os
+import os
 import numpy as np
 import json
 import ast
-import pickle as pk
 from scipy import spatial
 from lshash import lshash
 
@@ -15,14 +14,6 @@ t = int(sys.argv[5])
 vecoption = 'tf' #sys.argv[3]     # tf, tfidf
 
 os.chdir(folder)
-
-# load string, time series reprsentations: for edit distance and DTW
-words = {}
-for filename in glob.glob('*.wrd'):
-    fn = os.path.splitext(filename)[0]
-    with open(filename) as json_file:
-        data = json.load(json_file)
-        words[fn] = data
 
 # load vector representations: for PCA, SVD, NMF, LDA
 if vecoption == 'tf':
@@ -57,11 +48,15 @@ for key, val in vec.items():
     features[f2i[li[0]]][w2i[(li[1], li[2], li[3])]] = val
 X = np.array(features)
 
+# initialize
 lsh = lshash(L, k)
+# build index
 lsh.index(X)
+# retrieval
 q_vec = X[f2i[gestureselect]]
 [ret, overall, unique] = lsh.query(q_vec)
 
+# sort the results according to Euclidean distance
 dist = {}
 for idx in ret:
     dist[i2f[idx]] = spatial.distance.euclidean(q_vec, X[idx])
@@ -69,4 +64,6 @@ rank = [k for k, v in sorted(dist.items(), key = lambda item : item[1])]
 rank = [rank[i] for i in range(min(t, len(rank)))]
 print('overall: ' + str(overall))
 print('unique: ' + str(unique))
-print(",".join(rank))
+#print(",".join(rank))
+rank = [int(r) for r in rank]
+print(rank)

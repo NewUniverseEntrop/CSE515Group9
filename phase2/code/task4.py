@@ -1,5 +1,5 @@
 import sys
-import glob, os
+import os
 import numpy as np
 import json
 import ast
@@ -9,9 +9,9 @@ from lshash import lshash
 
 folder = sys.argv[1]
 # gestureselect = sys.argv[2] # query gesture
-relevant = list(sys.argv[2].split(','))
-irrelevant = list(sys.argv[3].split(','))
-neutral = list(sys.argv[4].split(','))
+relevant = [] if sys.argv[2] == "-1" else list(sys.argv[2].split(','))
+irrelevant = [] if sys.argv[3] == "-1" else list(sys.argv[3].split(','))
+neutral = [] if sys.argv[4] == "-1" else list(sys.argv[4].split(','))
 vecoption = 'tf' # sys.argv[3]     # tf, tfidf
 try:
     gestureselect = sys.argv[5]
@@ -73,10 +73,11 @@ pi = (np.sum(features_norm[relevant, :], axis = 0) + 0.5) / (len(relevant) + 1)
 ui = (np.sum(features_norm[irrelevant, :], axis = 0) + 0.5) / (len(irrelevant) + 1)
 # adjust the query and transform back to original scale
 Qnew = np.log(pi * (1 - ui) / (ui * (1 - pi))) * np.max(features, axis = 0)
+q = features[f2i[gestureselect]]
 
-# for test purpose
+# begin: for test purpose
+'''
 if gestureselect != -1:
-    q = features[f2i[gestureselect]]
     dist1 = {}
     dist2 = {}
     for gesture2, fea2 in enumerate(features):
@@ -88,9 +89,11 @@ if gestureselect != -1:
     print(",".join(dist1[0: 10]))
     print('revised')
     print(",".join(dist2[0: 10]))
+'''
+# end: for test purpuse
 
 dist = {}
 for ges in full:
-    dist[i2f[ges]] = spatial.distance.euclidean(Qnew, features[ges])
+    dist[i2f[ges]] = spatial.distance.euclidean(Qnew + q, features[ges])
 dist = [k for k, v in sorted(dist.items(), key = lambda item : item[1])]
 print(",".join(dist))
