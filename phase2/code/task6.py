@@ -102,24 +102,28 @@ def cmd(cmd):
     print("err: '{}'".format(err))
     print("exit: {}".format(p_status))
     return output,err,p
-def run(command):
+
+import ast
+def run(task,command):
     # run other tasks 
-    if "task3" in command:    
+    if "three" in task:    
         ## call date command ##
         p = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True)
         output, err = p.communicate()
-        output=output.decode().rstrip().split(",")
-        print("output",output)
-        update(output) # update gui
+        print(output)
+        output=output.decode().rstrip().split("\n")
+        output=output[len(output)-1]
+        #print("output",ast.literal_eval(output))
+        update(ast.literal_eval(output)) # update gui
         #hintlabel.config(text="task3 successful")
-    if "task4" in command:
+    if "fourth" in task:
         command=add(command) 
         cmd(command)
-    if "task5" in command:
+    if "five" in task:
         command=add(command) 
         cmd(command)
     else:
-        os.system(command)
+        cmd(command)
     #print(command)
 Grid.rowconfigure(root, 0, weight=1,)
 Grid.columnconfigure(root, 0, weight=1)
@@ -154,23 +158,23 @@ numberOfResultlabel.grid(column=3,row=2,columnspan=2)
 num.grid(column=3, row=3, columnspan=2)
 task_one_lable.grid(column=3, row=4, columnspan=2)
 task_one_entry.grid(column=3,row=5,columnspan=2)
-ttk.Button(Controlframe,text="Run task 1",command=lambda :run("python task1.py " +task_one_entry.get())).grid(column=3,row=6,columnspan=2)   
+ttk.Button(Controlframe,text="Run task 1",command=lambda :run("first" ,task_one_entry.get())).grid(column=3,row=6,columnspan=2)   
 twolabel.grid(column=3, row=7, columnspan=2)
 twoentry.grid(column=3,row=8,columnspan=2)
-ttk.Button(Controlframe,text="Run task 2",command=lambda :run("python task2.py "+twoentry.get())).grid(column=3,row=9,columnspan=2)
+ttk.Button(Controlframe,text="Run task 2",command=lambda :run("second",twoentry.get())).grid(column=3,row=9,columnspan=2)
 
 threelabel.grid(column=3, row=11, columnspan=2)
 threeentry.grid(column=3,row=12,columnspan=2)
-ttk.Button(Controlframe,text="Run task 3", command=lambda :run("python task3.py"+threeentry.get())).grid(column=3,row=13,columnspan=2)
+ttk.Button(Controlframe,text="Run task 3", command=lambda :run("three",threeentry.get())).grid(column=3,row=13,columnspan=2)
 
 
 fourLabel.grid(column=3, row=16)
 fourentry.grid(column=3, row=17)
-ttk.Button(Controlframe,text="Submit feedback with task 4", command=lambda :run("python task4.py"+fourentry.get())).grid(column=3,row=18,columnspan=2)
+ttk.Button(Controlframe,text="Submit task 4", command=lambda :run("fourth",fourentry.get())).grid(column=3,row=18,columnspan=2)
 
 fiveLabel.grid(column=3, row=19)
 fiveentry.grid(column=3,row=20)
-ttk.Button(Controlframe,text="Submit feedback with task 5", command=lambda :run(fiveentry.get())).grid(column=3,row=29,columnspan=2)
+ttk.Button(Controlframe,text="Submit task 5", command=lambda :run("five",fiveentry.get())).grid(column=3,row=29,columnspan=2)
 
 
 # left pane
