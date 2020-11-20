@@ -8,10 +8,15 @@ from scipy import spatial
 from lshash import lshash
 
 folder = sys.argv[1]
-gestureselect = sys.argv[2] # query gesture
-vecoption = sys.argv[3]     # tf, tfidf
-relevant = list(sys.argv[4].split(','))
-irrelevant = list(sys.argv[5].split(','))
+# gestureselect = sys.argv[2] # query gesture
+relevant = list(sys.argv[2].split(','))
+irrelevant = list(sys.argv[3].split(','))
+neutral = list(sys.argv[4].split(','))
+vecoption = 'tf' # sys.argv[3]     # tf, tfidf
+try:
+    gestureselect = sys.argv[5]
+except:
+    gestureselect = -1
 
 os.chdir(folder)
 
@@ -48,8 +53,11 @@ for key, val in vec.items():
     features[f2i[li[0]]][w2i[(li[1], li[2], li[3])]] = val
 X = np.array(features)
 
+
 relevant = [f2i[r] for r in relevant]
 irrelevant = [f2i[ir] for ir in irrelevant]
+neutral = [f2i[neu] for neu in neutral]
+full = relevant + irrelevant + neutral
 
 # Salton and Buckley
 # Qnew = log[pi(1-ui)/ui(1-pi)]
@@ -66,21 +74,23 @@ ui = (np.sum(features_norm[irrelevant, :], axis = 0) + 0.5) / (len(irrelevant) +
 # adjust the query and transform back to original scale
 Qnew = np.log(pi * (1 - ui) / (ui * (1 - pi))) * np.max(features, axis = 0)
 
-q = features[f2i[gestureselect]]
+# for test purpose
+if gestureselect != -1:
+    q = features[f2i[gestureselect]]
+    dist1 = {}
+    dist2 = {}
+    for gesture2, fea2 in enumerate(features):
+        dist1[i2f[gesture2]] = spatial.distance.euclidean(q, fea2)
+        dist2[i2f[gesture2]] = spatial.distance.euclidean(Qnew, fea2)
+    dist1 = [k for k, v in sorted(dist1.items(), key = lambda item : item[1])]
+    dist2 = [k for k, v in sorted(dist2.items(), key = lambda item : item[1])]
+    print('original')
+    print(",".join(dist1[0: 10]))
+    print('revised')
+    print(",".join(dist2[0: 10]))
 
-dist1 = {}
-dist2 = {}
-dist3 = {}
-for gesture2, fea2 in enumerate(features):
-    dist1[i2f[gesture2]] = spatial.distance.euclidean(q, fea2)
-    dist2[i2f[gesture2]] = spatial.distance.euclidean(Qnew, fea2)
-    dist3[i2f[gesture2]] = spatial.distance.euclidean(q + Qnew, fea2)
-dist1 = [(k, v) for k, v in sorted(dist1.items(), key = lambda item : item[1])]
-dist2 = [(k, v) for k, v in sorted(dist2.items(), key = lambda item : item[1])]
-dist3 = [(k, v) for k, v in sorted(dist3.items(), key = lambda item : item[1])]
-print('original')
-print(dist1[0: 10])
-print('revised')
-print(dist2[0: 10])
-print('combined')
-print(dist3[0: 10])
+dist = {}
+for ges in full:
+    dist[i2f[ges]] = spatial.distance.euclidean(Qnew, features[ges])
+dist = [k for k, v in sorted(dist.items(), key = lambda item : item[1])]
+print(",".join(dist))
