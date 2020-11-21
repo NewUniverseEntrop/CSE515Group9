@@ -6,14 +6,48 @@
 
 
 import json
+import pandas as pd
 import numpy as np
 import sys,os
+import matplotlib.pyplot as plt
+
+
 folder = sys.argv[1]
 os.chdir(folder)
 k = int(sys.argv[2])
 m = int(sys.argv[3])
 user_selected_gestures = list(sys.argv[4].split(','))
 
+def visualise_component(gesture,component):
+    filename = component + '/' + str(gesture) + '.csv'
+    df = pd.read_csv(filename,header=None).T
+    df_norm = df.copy()
+    for column in df_norm.columns:
+        min = df_norm[column].min()
+        max = df_norm[column].max()
+        if min == max:
+            df_norm[column].values[:] = 0
+        else:
+            df_norm[column] = (2*(df_norm[column] - min)) / (max - min) - 1
+    series = df_norm[df_norm.columns[0]].to_numpy()
+    for column in df_norm.columns:
+        plt.plot(df_norm[column].to_numpy(), label=column)
+    # plt.plot(series,label = '0')
+    plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+    plt.show()
+    
+
+def visualise_gesture(gesture):
+    for component in ['W','X','Y','Z']:
+        visualise_component(gesture,component)
+        break
+
+
+def visualise_gestures(m_gestures):
+    for gesture in m_gestures:
+        visualise_gesture(gesture)
+        break
+        
 def getNearestNeightbours(arr,k=2):
     print(arr)
     if np.sum(arr) == 0:
@@ -51,10 +85,12 @@ similarity_matrix = np.transpose(np.array([[0,0.03,0.02,0.01],[0.9,0,0,0],[0.7,0
 # similarity_matrix = np.transpose(np.array([[0,0.3,0,0],[0,0,0,0],[0,0.9,0,0],[0,0,0.1,0]]))
 # similarity_matrix = np.transpose(np.array([[0,0.4,0.2,0.9],[0.4,0,0.3,0.06],[0.2,0.3,0,0.7],[0.9,0.06,0.7,0]]))
 similarity_matrix = np.load('similarity_matrix_dtw.npy')
+for i in range(len(similarity_matrix)):
+    similarity_matrix[i][i] = 0
 print(similarity_matrix)
 
 # k = 4
-seed_vector=np.array([1,0,1,0]).reshape(-1,1)
+seed_vector= np.array([1,0,1,0]).reshape(-1,1)
 seed_vector = np.zeros(similarity_matrix.shape[0]).reshape(-1,1)
 with open('f2i.dump', 'r') as fp:
     f2i = json.load(fp)
@@ -78,4 +114,10 @@ print(transformed_similarity_matrix)
 ranks = PPR(transformed_similarity_matrix,seed_vector,max_iterations=100)
 print(ranks)
 ranks = ranks.reshape(-1)
+print("output")
 print(ranks.argsort()[-m:][::-1])
+output = ranks.argsort()[-m:][::-1]
+# visualise_gestures(output)
+
+
+
