@@ -126,7 +126,7 @@ def cmd(cmd):
 import ast
 def run(task,command):
     # run other tasks 
-    if "three" in task:    
+    if "345" in task :    
         ## call date command ##
         p = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True)
         output, err = p.communicate()
@@ -138,7 +138,7 @@ def run(task,command):
         #print("output",ast.literal_eval(output))
         update(ast.literal_eval(output)) # update gui
         ttk.Label(scrollable_frame,text=task3Out).grid(column=0,row=100, columnspan=10)
-    if "fourth" in task:
+    elif "fourth" in task:
         command=add(command) 
         p = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True)
         output, err = p.communicate()
@@ -147,7 +147,7 @@ def run(task,command):
         output=output[len(output)-1]
         #print("output",ast.literal_eval(output))
         update(ast.literal_eval(output)) # update gui
-    if "five" in task:
+    elif "five" in task:
         command=add(command) 
         p = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True)
         output, err = p.communicate()
@@ -201,15 +201,15 @@ ttk.Button(Controlframe,text="Run task 2",command=lambda :run("second",twoentry.
 
 threelabel.grid(column=3, row=11, columnspan=2)
 threeentry.grid(column=3,row=12,columnspan=2)
-ttk.Button(Controlframe,text="Run task 3", command=lambda :run("three",threeentry.get())).grid(column=3,row=13,columnspan=2)
+ttk.Button(Controlframe,text="Run task 3", command=lambda :run("345",threeentry.get())).grid(column=3,row=13,columnspan=2)
 
 fourLabel.grid(column=3, row=16)
 fourentry.grid(column=3, row=17)
-ttk.Button(Controlframe,text="Submit task 4", command=lambda :run("fourth",fourentry.get())).grid(column=3,row=18,columnspan=2)
+ttk.Button(Controlframe,text="Submit task 4", command=lambda :run("345",fourentry.get())).grid(column=3,row=18,columnspan=2)
 
 fiveLabel.grid(column=3, row=19)
 fiveentry.grid(column=3,row=20)
-ttk.Button(Controlframe,text="Submit task 5", command=lambda :run("fifh",fiveentry.get())).grid(column=3,row=29,columnspan=2)
+ttk.Button(Controlframe,text="Submit task 5", command=lambda :run("345",fiveentry.get())).grid(column=3,row=29,columnspan=2)
 
 
 # left pane
