@@ -12,11 +12,14 @@ folder = sys.argv[1]
 relevant = [] if sys.argv[2] == "-1" else list(sys.argv[2].split(','))
 irrelevant = [] if sys.argv[3] == "-1" else list(sys.argv[3].split(','))
 neutral = [] if sys.argv[4] == "-1" else list(sys.argv[4].split(','))
-vecoption = 'tf' # sys.argv[3]     # tf, tfidf
 try:
     gestureselect = sys.argv[5]
 except:
     gestureselect = -1
+try:
+    vecoption = sys.argv[6]     # tf, tfidf
+except:
+    vecoption = 'tf'
 
 os.chdir(folder)
 
@@ -58,6 +61,8 @@ relevant = [f2i[r] for r in relevant]
 irrelevant = [f2i[ir] for ir in irrelevant]
 neutral = [f2i[neu] for neu in neutral]
 full = relevant + irrelevant + neutral
+if gestureselect != -1:
+    full += [f2i[gestureselect]]
 
 # Salton and Buckley
 # Qnew = log[pi(1-ui)/ui(1-pi)]
@@ -73,7 +78,11 @@ pi = (np.sum(features_norm[relevant, :], axis = 0) + 0.5) / (len(relevant) + 1)
 ui = (np.sum(features_norm[irrelevant, :], axis = 0) + 0.5) / (len(irrelevant) + 1)
 # adjust the query and transform back to original scale
 Qnew = np.log(pi * (1 - ui) / (ui * (1 - pi))) * np.max(features, axis = 0)
-q = features[f2i[gestureselect]]
+
+try:
+    q = features[f2i[gestureselect]]
+except:
+    q = 0
 
 # begin: for test purpose
 '''
@@ -95,5 +104,5 @@ if gestureselect != -1:
 dist = {}
 for ges in full:
     dist[i2f[ges]] = spatial.distance.euclidean(Qnew + q, features[ges])
-dist = [k for k, v in sorted(dist.items(), key = lambda item : item[1])]
-print(",".join(dist))
+dist = [int(k) for k, v in sorted(dist.items(), key = lambda item : item[1])]
+print(dist)
