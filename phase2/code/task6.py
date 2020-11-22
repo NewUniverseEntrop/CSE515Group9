@@ -84,21 +84,22 @@ def add(command):
     neutral=""
     #global feedbackResult
     for x in feedbackResult:
+        
         if feedbackResult[x]==1:
             if good=="":
-                good=good+""+x
+                good=good+""+str(x)
             else:
-                good=good+","+x
+                good=good+","+str(x)
         elif feedbackResult[x]==-1:
             if bad=="":
-                bad=bad+""+x
+                bad=bad+""+str(x)
             else:
-                bad=bad+","+x
+                bad=bad+","+str(x)
         else:
             if neutral=="":
-                neutral=x
+                neutral=str(x)
             else:
-                neutral=neutral+","+x
+                neutral=neutral+","+str(x)
     if good == "":
         good="-1"
     if bad=="":
