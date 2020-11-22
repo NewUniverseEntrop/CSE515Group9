@@ -50,7 +50,8 @@ def PPR(adjacency_matrix, seed_vector, max_iterations=100, beta_probabilty=0.15)
 similarity_matrix = np.load('similarity_matrix_dtw.npy')
 for i in range(len(similarity_matrix)):
     similarity_matrix[i][i] = 0
-k = 5
+    
+    
 seed_vector=np.array([1,0,1,0]).reshape(-1,1)
 seed_vector = np.zeros(similarity_matrix.shape[0]).reshape(-1,1)
 with open('f2i.dump', 'r') as fp:
@@ -64,7 +65,7 @@ classified_labels = labels_df[labels_df['label'] != -1]
 print(classified_labels)
 
 unclassified_label = labels_df[labels_df['label'] == -1]
-print(unclassified_label)
+unclassified_label['i'] = unclassified_label['file'].apply(lambda f: f2i[str(int(f))])
 
 
 class_labels = {0 : [], 1:[], 2:[]}
@@ -73,80 +74,12 @@ for i,row in classified_labels.iterrows():
     index = f2i[str(int(row['file']))]
     label = int(row['label'])
     class_labels[label].append(index)
-# for i in range(31):
-#     class_labels[0].append(i)
-# for i in range(31,62):
-#     class_labels[1].append(i)
-# for i in range(62,93):
-#     class_labels[2].append(i)
 
-# class_labels[2].remove(69)
 print(class_labels)
-file_indices = [0,92]
-
-#class1
-transformed_similarity_matrix = get_transition_matrix(similarity_matrix, 0, class_labels, file_indices)
-transformed_similarity_matrix= np.apply_along_axis(column_normalize,axis=0,arr=transformed_similarity_matrix)
-
-seed_vector = np.zeros(similarity_matrix.shape[0]).reshape(-1,1)
-for i in class_labels[0]:
-    seed_vector[i] = 1
-
-for unclassified_gesture in file_indices:
-    seed_vector[unclassified_gesture] = 1
-# seed_vector[file_index] = 1
-ranks = PPR(transformed_similarity_matrix,seed_vector,max_iterations=100)
-score1 = ranks[file_indices]
-# print(ranks[file_indices])
-for file_index in file_indices:
-    print(ranks[file_index])
-
-#class2
-transformed_similarity_matrix = get_transition_matrix(similarity_matrix, 1, class_labels, file_indices)
-transformed_similarity_matrix= np.apply_along_axis(column_normalize,axis=0,arr=transformed_similarity_matrix)
-
-seed_vector = np.zeros(similarity_matrix.shape[0]).reshape(-1,1)
-for i in class_labels[1]:
-    seed_vector[i] = 1
-
-for unclassified_gesture in file_indices:
-    seed_vector[unclassified_gesture] = 1
-# seed_vector[file_index] = 1
-ranks = PPR(transformed_similarity_matrix,seed_vector,max_iterations=100)
-for file_index in file_indices:
-    print(ranks[file_index])
+file_indices = unclassified_label['i'].to_numpy()
 
 
-#class3
-transformed_similarity_matrix = get_transition_matrix(similarity_matrix, 2, class_labels, file_indices)
-transformed_similarity_matrix= np.apply_along_axis(column_normalize,axis=0,arr=transformed_similarity_matrix)
-
-seed_vector = np.zeros(similarity_matrix.shape[0]).reshape(-1,1)
-for i in class_labels[2]:
-    seed_vector[i] = 1
-
-for unclassified_gesture in file_indices:
-    seed_vector[unclassified_gesture] = 1
-# seed_vector[file_index] = 1
-ranks = PPR(transformed_similarity_matrix,seed_vector,max_iterations=100)
-for file_index in file_indices:
-    print(ranks[file_index])
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-def getRanksForClass(similarity_matrix,label,class_labels,file_index):
+def getRanksForClass(similarity_matrix, label, class_labels, file_index):
     transformed_similarity_matrix = get_transition_matrix(similarity_matrix, label, class_labels, file_index)
     transformed_similarity_matrix = np.apply_along_axis(column_normalize, axis=0, arr=transformed_similarity_matrix)
     
@@ -157,3 +90,30 @@ def getRanksForClass(similarity_matrix,label,class_labels,file_index):
     seed_vector[file_index] = 1
     ranks = PPR(transformed_similarity_matrix, seed_vector, max_iterations=100)
     return ranks
+
+
+
+ranks_0 = getRanksForClass(similarity_matrix,0,class_labels,file_indices)
+ranks_1 = getRanksForClass(similarity_matrix,1,class_labels,file_indices)
+ranks_2 = getRanksForClass(similarity_matrix,2,class_labels,file_indices)
+
+ranks_2d = np.array([ranks_0,ranks_1,ranks_2])
+ranks_2d = np.take(ranks_2d, file_indices, axis=1)
+print(ranks_2d)
+result = np.argmax(ranks_2d, axis=0)
+
+for index, i in enumerate(file_indices):
+    file = i2f[str(i)]
+    print(str(file) + " - " + str(result[index]))
+
+
+
+
+
+
+
+
+
+
+
+
