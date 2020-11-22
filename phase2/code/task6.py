@@ -210,7 +210,7 @@ ttk.Button(Controlframe,text="Submit task 4", command=lambda :run("fourth",foure
 
 fiveLabel.grid(column=3, row=19)
 fiveentry.grid(column=3,row=20)
-ttk.Button(Controlframe,text="Submit task 5", command=lambda :run("fifh",fiveentry.get())).grid(column=3,row=29,columnspan=2)
+ttk.Button(Controlframe,text="Submit task 5", command=lambda :run("five",fiveentry.get())).grid(column=3,row=29,columnspan=2)
 
 
 # left pane
