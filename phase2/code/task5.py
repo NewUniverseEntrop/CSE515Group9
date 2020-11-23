@@ -10,11 +10,13 @@ import numpy as np
 import sys,os
 folder = sys.argv[1]
 os.chdir(folder)
-k = int(sys.argv[2])
-m = int(sys.argv[3])
-relevant = [] if sys.argv[4] == "-1" else list(sys.argv[4].split(','))
-irrelevant = [] if sys.argv[5] == "-1" else list(sys.argv[5].split(','))
-q = sys.argv[6]
+relevant = [] if sys.argv[2] == "-1" else list(sys.argv[2].split(','))
+irrelevant = [] if sys.argv[3] == "-1" else list(sys.argv[3].split(','))
+neutral = [] if sys.argv[4] == "-1" else list(sys.argv[4].split(','))
+try:
+    k = int(sys.argv[5])
+except:
+    k = 15
 
 def getNearestNeightbours(arr,k=2):
     #print(arr)
@@ -25,7 +27,6 @@ def getNearestNeightbours(arr,k=2):
         if i not in indices:
             arr[i] = 0
     return arr/np.sum(arr)
-
 
 
 def PPR(adjacency_matrix,seed_vector,max_iterations=100,beta_probabilty=0.15):
@@ -47,11 +48,7 @@ def PPR(adjacency_matrix,seed_vector,max_iterations=100,beta_probabilty=0.15):
             #print(i,sum)
             break
     return x
-    
 
-similarity_matrix = np.transpose(np.array([[0,0.03,0.02,0.01],[0.9,0,0,0],[0.7,0,0,0],[0.5,0,0,0]]))
-# similarity_matrix = np.transpose(np.array([[0,0.3,0,0],[0,0,0,0],[0,0.9,0,0],[0,0,0.1,0]]))
-# similarity_matrix = np.transpose(np.array([[0,0.4,0.2,0.9],[0.4,0,0.3,0.06],[0.2,0.3,0,0.7],[0.9,0.06,0.7,0]]))
 similarity_matrix = np.load('similarity_matrix_dtw.npy')
 for i in range(len(similarity_matrix)):
     similarity_matrix[i][i] = 0
@@ -64,12 +61,16 @@ with open('f2i.dump', 'r') as fp:
 with open('i2f.dump', 'r') as fp:
     i2f = json.load(fp)
 
-for gesture in relevant:
-    seed_vector[f2i[gesture]] = 1
-for gesture in irrelevant:
-    seed_vector[f2i[gesture]] = 0
-seed_vector[f2i[q]] = 2
+relevant = [f2i[r] for r in relevant]
+irrelevant = [f2i[r] for r in irrelevant]
+neutral = [f2i[r] for r in neutral]
 
+full = relevant + irrelevant + neutral
+
+for gesture in relevant:
+    seed_vector[gesture] = 1
+for gesture in irrelevant:
+    seed_vector[gesture] = 0
 
 transformed_similarity_matrix= np.apply_along_axis(getNearestNeightbours,axis=0,arr=similarity_matrix,k=k)
 #print(transformed_similarity_matrix)
@@ -77,6 +78,9 @@ ranks = PPR(transformed_similarity_matrix,seed_vector,max_iterations=100)
 #print(ranks)
 ranks = ranks.reshape(-1)
 
-ranks = ranks.argsort()[-m:][::-1]
-ranks = [i2f[str(r)] for r in ranks]
-print(ranks)
+ranks = ranks.argsort()[::-1]
+res = []
+for r in ranks:
+    if r in full:
+        res.append(int(i2f[str(r)]))
+print(res)

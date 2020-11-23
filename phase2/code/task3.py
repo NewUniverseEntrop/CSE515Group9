@@ -11,7 +11,10 @@ gestureselect = sys.argv[2] # query gesture
 L = int(sys.argv[3]) # number of layers
 k = int(sys.argv[4]) # hashes per layer
 t = int(sys.argv[5])
-vecoption = 'tf' #sys.argv[3]     # tf, tfidf
+try:
+    vecoption = sys.argv[6]     # tf, tfidf
+except:
+    vecoption = 'tf'
 
 os.chdir(folder)
 
