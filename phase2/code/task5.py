@@ -53,10 +53,11 @@ similarity_matrix = np.transpose(np.array([[0,0.03,0.02,0.01],[0.9,0,0,0],[0.7,0
 # similarity_matrix = np.transpose(np.array([[0,0.3,0,0],[0,0,0,0],[0,0.9,0,0],[0,0,0.1,0]]))
 # similarity_matrix = np.transpose(np.array([[0,0.4,0.2,0.9],[0.4,0,0.3,0.06],[0.2,0.3,0,0.7],[0.9,0.06,0.7,0]]))
 similarity_matrix = np.load('similarity_matrix_dtw.npy')
+for i in range(len(similarity_matrix)):
+    similarity_matrix[i][i] = 0
 # print(similarity_matrix)
 
 # k = 4
-seed_vector=np.array([1,0,1,0]).reshape(-1,1)
 seed_vector = np.ones(similarity_matrix.shape[0]).reshape(-1,1) * 0.5
 with open('f2i.dump', 'r') as fp:
     f2i = json.load(fp)
@@ -69,14 +70,6 @@ for gesture in irrelevant:
     seed_vector[f2i[gesture]] = 0
 seed_vector[f2i[q]] = 2
 
-# seed_vector[42] = 1
-# seed_vector[44] = 1
-# seed_vector[55] = 1
-# seed_vector[51] = 1
-# seed_vector[60] = 1
-
-#print(seed_vector)
-# m = 10
 
 transformed_similarity_matrix= np.apply_along_axis(getNearestNeightbours,axis=0,arr=similarity_matrix,k=k)
 #print(transformed_similarity_matrix)
