@@ -17,12 +17,13 @@
 ### Task 3: Multi-dimensional index structures and nearest neighbor search task:
 #### Parameters:
 * path
-* query gesture
+* q: query gesture
 * k: number of hash functions per layer
 * L: number of layers
+* t: results requested
 * vector model (optional): tf (default), tfidf
 ```
-python task3.py ../3_class_gesture_data 249 5 10
+python task3.py ../3_class_gesture_data 249 5 10 10
 ```
 
 ### Task 4
@@ -30,7 +31,7 @@ python task3.py ../3_class_gesture_data 249 5 10
 * path
 * relevant: objects user marked as relevant
 * irrelevant: objects user marked as irrelevant
-* neutral: objects with no opinion provide
+* neutral: objects with no opinion provided
 ```
 python task4.py ../3_class_gesture_data 1,2 255,549 10,11,12
 ```
@@ -40,7 +41,7 @@ python task4.py ../3_class_gesture_data 1,2 255,549 10,11,12
 * path
 * relevant: objects user marked as relevant
 * irrelevant: objects user marked as irrelevant
-* neutral: objects with no opinion provide
+* neutral: objects with no opinion provided
 ```
 python task5.py ../3_class_gesture_data 1,2 255,549 10,11,12
 ```
