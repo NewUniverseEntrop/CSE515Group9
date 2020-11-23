@@ -1,4 +1,3 @@
-
 # run phase 2 task3 to generate similarity matrix before running PPR
 #   gesturedisc.py /Users/xavi/MWDB/xin/CSE515Group9/phase2/3_class_gesture_data tfidf dtw 3 svd
 # task1.py /Users/xavi/MWDB/xin/CSE515Group9/phase2/3_class_gesture_data 2 10 1,2,3,4,5
@@ -16,7 +15,7 @@ neutral = [] if sys.argv[4] == "-1" else list(sys.argv[4].split(','))
 try:
     k = int(sys.argv[5])
 except:
-    k = 15
+    k = 4
 
 def getNearestNeightbours(arr,k=2):
     #print(arr)
@@ -53,7 +52,7 @@ similarity_matrix = np.load('similarity_matrix_dtw.npy')
 # print(similarity_matrix)
 
 # k = 4
-seed_vector = np.ones(similarity_matrix.shape[0]).reshape(-1,1) * 0.5
+seed_vector = np.ones(similarity_matrix.shape[0]).reshape(-1,1) * 0.1
 with open('f2i.dump', 'r') as fp:
     f2i = json.load(fp)
 with open('i2f.dump', 'r') as fp:
