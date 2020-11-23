@@ -8,21 +8,42 @@
 
 ## Phase 3
 ### Task 1
+[TBD] Ravi
+
+
 ### Task 2
+[TBD] Manuha and Ravi
+
 ### Task 3: Multi-dimensional index structures and nearest neighbor search task:
 #### Parameters:
 * path
 * query gesture
-* vector model: tf, tfidf
-* option: use original vectors or dimension-reduced vectors; orig, pca, svd, nmf, lda
 * k: number of hash functions per layer
 * L: number of layers
+* vector model (optional): tf (default), tfidf
 ```
-python gesturelsh.py ../3_class_gesture_data 249 'tfidf' 'orig' 5 10
+python task3.py ../3_class_gesture_data 249 5 10
 ```
 
 ### Task 4
+#### Parameters: probabilistic relevance feedback
+* path
+* relevant: objects user marked as relevant
+* irrelevant: objects user marked as irrelevant
+* neutral: objects with no opinion provide
+```
+python task4.py ../3_class_gesture_data 1,2 255,549 10,11,12
+```
+
 ### Task 5
+#### Parameters: classifier-based relevance feedback
+* path
+* relevant: objects user marked as relevant
+* irrelevant: objects user marked as irrelevant
+* neutral: objects with no opinion provide
+```
+python task5.py ../3_class_gesture_data 1,2 255,549 10,11,12
+```
 
 ## Phase 2
 ### Task 0a
