@@ -43,7 +43,7 @@ for key, value in vec.items():
 w2i = {}
 for idx, word in enumerate(wordset):
     w2i[word] = idx
-gesturelist = sorted([int(v) for v in gestureset])
+gesturelist = sorted([v for v in gestureset])
 f2i = {} # map from document to index
 i2f = {} # map from index to document
 for idx, finset in enumerate(gesturelist):
@@ -104,5 +104,5 @@ if gestureselect != -1:
 dist = {}
 for ges in full:
     dist[i2f[ges]] = spatial.distance.euclidean(Qnew + q, features[ges])
-dist = [int(k) for k, v in sorted(dist.items(), key = lambda item : item[1])]
+dist = [k for k, v in sorted(dist.items(), key = lambda item : item[1])]
 print(dist)

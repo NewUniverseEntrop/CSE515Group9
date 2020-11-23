@@ -38,7 +38,7 @@ for key, value in vec.items():
 w2i = {}
 for idx, word in enumerate(wordset):
     w2i[word] = idx
-gesturelist = sorted([int(v) for v in gestureset])
+gesturelist = sorted([v for v in gestureset])
 f2i = {} # map from document to index
 i2f = {} # map from index to document
 for idx, finset in enumerate(gesturelist):
@@ -68,5 +68,4 @@ rank = [rank[i] for i in range(min(t, len(rank)))]
 print('overall: ' + str(overall))
 print('unique: ' + str(unique))
 #print(",".join(rank))
-rank = [int(r) for r in rank]
 print(rank)

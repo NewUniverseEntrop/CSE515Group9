@@ -81,5 +81,5 @@ ranks = ranks.argsort()[::-1]
 res = []
 for r in ranks:
     if r in full:
-        res.append(int(i2f[str(r)]))
+        res.append(i2f[str(r)])
 print(res)

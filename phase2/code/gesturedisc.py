@@ -59,7 +59,7 @@ w2i = {}
 for idx, word in enumerate(wordset):
     w2i[word] = idx
 
-gesturelist = sorted([int(v) for v in gestureset])
+gesturelist = sorted([v for v in gestureset])
 f2i = {} # map from document to index
 i2f = {} # map from index to document
 for idx, finset in enumerate(gesturelist):
