@@ -49,6 +49,8 @@ def PPR(adjacency_matrix,seed_vector,max_iterations=100,beta_probabilty=0.15):
     return x
 
 similarity_matrix = np.load('similarity_matrix_dtw.npy')
+for i in range(len(similarity_matrix)):
+    similarity_matrix[i][i] = 0
 # print(similarity_matrix)
 
 # k = 4
