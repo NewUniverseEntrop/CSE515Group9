@@ -62,25 +62,24 @@ with open('f2i.dump', 'r') as fp:
 with open('i2f.dump', 'r') as fp:
     i2f = json.load(fp)
 
-labels_df = pd.read_csv('labels.csv')
-labels_df = labels_df.fillna(-1)
-classified_labels = labels_df[labels_df['label'] != -1]
-print(classified_labels)
+class_label_map = {'vattene' : 0, 'combinato' : 1, 'daccordo' : 2}
+reverse_dictionary = {v:k for k,v in class_label_map.items()}
+labels_df = pd.read_excel('labels.xlsx', names=['file', 'label'], header=None).astype(str)
+labels_df['numeric_label'] = labels_df['label'].apply(lambda label : class_label_map[label])
+file_label_dict = dict(zip(labels_df.file, labels_df.numeric_label))
 
-unclassified_label = labels_df[labels_df['label'] == -1]
-unclassified_label['i'] = unclassified_label['file'].apply(lambda f: f2i[str(f)])
-unclassified_label['file'] = unclassified_label['file'].astype(str)
-classified_labels['file'] = classified_labels['file'].astype(str)
 
 class_labels = {0 : [], 1:[], 2:[]}
-
-for i,row in classified_labels.iterrows():
+file_indices = list(i2f.keys())
+file_indices = [int(k) for k in file_indices]
+for i,row in labels_df.iterrows():
     index = f2i[str(row['file'])]
-    label = int(row['label'])
+    label = int(row['numeric_label'])
     class_labels[label].append(index)
+    file_indices.remove(index)
 
 print(class_labels)
-file_indices = unclassified_label['i'].to_numpy()
+
 
 
 def getRanksForClass(similarity_matrix, label, class_labels, file_index):
@@ -106,7 +105,30 @@ ranks_2d = np.take(ranks_2d, file_indices, axis=1)
 print(ranks_2d)
 result = np.argmax(ranks_2d, axis=0)
 
+n = len(file_indices)
+x = 0
 for index, i in enumerate(file_indices):
     file = i2f[str(i)]
-    print(str(file) + " - " + str(result[index]))
+    label = reverse_dictionary[result[index][0]]
+    numberic_label = result[index][0]
+    print(str(file)  + " - " +  label +  " - " + str(result[index]) )
+    if '_' in file:
+        file = file.split('_')[0]
+        true_label = file_label_dict[file]
+        if(true_label == numberic_label):
+            x+=1
+    else:
+        file = int(file)
+        if file<32:
+            if numberic_label == 0:
+                x+=1
+        elif file<300 and file>200:
+            if numberic_label == 1:
+                x += 1
+        elif file > 400:
+            if numberic_label == 2:
+                x+=1
+
+print("Accuracy : ", float(x/n) * 100)
+            
 
