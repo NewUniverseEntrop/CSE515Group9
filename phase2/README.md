@@ -8,14 +8,14 @@
 
 ## Phase 3
 ### Task 1
-python gesturedisc.py folder  tfidf dtw 3 svd
-python task1.py folder 3 10 1,3,5
+### python gesturedisc.py folder  tfidf dtw 3 svd
+### python task1.py folder 3 10 1,3,5
 
 
 ### Task 2
 [TBD] Manuha and Ravi
-ppr 
-python ppr_classifier folder
+### ppr 
+### python ppr_classifier folder
 
 
 ### Task 3: Multi-dimensional index structures and nearest neighbor search task:
