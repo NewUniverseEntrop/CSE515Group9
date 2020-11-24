@@ -14,7 +14,6 @@
 
 ### Task 2
 [TBD] Manuha and Ravi
-### ppr 
 ### python ppr_classifier folder
 
 
