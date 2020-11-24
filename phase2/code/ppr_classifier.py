@@ -3,7 +3,10 @@ import json
 import pandas as pd
 import numpy as np
 import sys,os
-os.chdir('/Users/xavi/MWDB/xin/CSE515Group9/phase2/3_class_gesture_data')
+
+# label.csv and similarity_matrix_dtw.npy  should exist in input folder
+folder = sys.argv[1]
+os.chdir(folder)
 
 
 def get_transition_matrix(adj_matrix,class_label,labels,indices):
@@ -65,13 +68,14 @@ classified_labels = labels_df[labels_df['label'] != -1]
 print(classified_labels)
 
 unclassified_label = labels_df[labels_df['label'] == -1]
-unclassified_label['i'] = unclassified_label['file'].apply(lambda f: f2i[str(int(f))])
-
+unclassified_label['i'] = unclassified_label['file'].apply(lambda f: f2i[str(f)])
+unclassified_label['file'] = unclassified_label['file'].astype(str)
+classified_labels['file'] = classified_labels['file'].astype(str)
 
 class_labels = {0 : [], 1:[], 2:[]}
 
 for i,row in classified_labels.iterrows():
-    index = f2i[str(int(row['file']))]
+    index = f2i[str(row['file'])]
     label = int(row['label'])
     class_labels[label].append(index)
 
@@ -105,15 +109,4 @@ result = np.argmax(ranks_2d, axis=0)
 for index, i in enumerate(file_indices):
     file = i2f[str(i)]
     print(str(file) + " - " + str(result[index]))
-
-
-
-
-
-
-
-
-
-
-
 
