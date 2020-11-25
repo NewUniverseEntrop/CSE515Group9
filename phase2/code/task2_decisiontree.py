@@ -1,102 +1,82 @@
 import pandas as pd
 import pickle
+import json
+import sys
 
-
-# Split a dataset based on an attribute and an attribute value
-def test_split(column, value, dataset):
+def test_split_attribute(column, value, dataset):
     left, right = list(), list()
     for index,row in dataset.iterrows():
-        # print(row.iloc[column])
         if row.iloc[column] < value:
             left.append(row)
         else:
             right.append(row)
     return left, right
 
-# Calculate the Gini index for a split dataset
-def gini_index(groups, classes):
-    # count all samples at split point
-    n_instances = float(sum([len(group) for group in groups]))
-    # sum weighted Gini index for each group
+def compute_gini_index(groups, classes):
+    num_instances = float(sum([len(group) for group in groups]))
     gini = 0.0
     for group in groups:
         size = float(len(group))
-        # avoid divide by zero
         if size == 0:
             continue
         score = 0.0
-        # score the group based on the score for each class
         for class_val in classes:
             p = [row.iloc[-1] for row in group].count(class_val) / size
             score += p * p
-        # weight the group score by its relative size
-        gini += (1.0 - score) * (size / n_instances)
+        gini += (1.0 - score) * (size / num_instances)
     return gini
 
-# Select the best split point for a dataset
-def get_split(dataset):
+def get_split_pts(dataset):
     class_values = list(set(row.iloc[-1] for index,row in dataset.iterrows() ))
     print(class_values)    
-    b_index, b_value, b_score, b_groups = 999, 999, 999, None
-    # print(dataset.shape[1]-1)
+    best_index, best_value, best_score, best_groups = 999, 999, 999, None
     for column in range(0,dataset.shape[1]-1):
         for index,row in dataset.iterrows():
-            # print(row)
-            groups = test_split(column, row.iloc[column], dataset)
-            gini = gini_index(groups, class_values)
-            if gini < b_score:
-                b_index, b_value, b_score, b_groups = column, row.iloc[column], gini, groups
-    return {'index':b_index, 'value':b_value, 'groups':b_groups}
+            groups = test_split_attribute(column, row.iloc[column], dataset)
+            gini = compute_gini_index(groups, class_values)
+            if gini < best_score:
+                best_index, best_value, best_score, best_groups = column, row.iloc[column], gini, groups
+    return {'index':best_index, 'value':best_value, 'groups':best_groups}
 
-# Create a terminal node value
-def to_terminal(group):
+def get_term_node(group):
     outcomes = [row.iloc[-1] for index,row in group.iterrows()]
     return max(set(outcomes), key=outcomes.count)
 
-# Create child splits for a node or make terminal
-def split(node, max_depth, min_size, depth):
+def split_till_term(node, max_depth, min_size, depth):
     left, right = node['groups']
     left = pd.DataFrame(left)
     right = pd.DataFrame(right)
     del(node['groups'])
-    # check for a no split
     if left.shape[0] == 0 or right.shape[0] == 0:
-        node['left'] = node['right'] = to_terminal(left.append(right))
+        node['left'] = node['right'] = get_term_node(left.append(right))
         return
-    # check for max depth
     if depth >= max_depth:
-        node['left'], node['right'] = to_terminal(left), to_terminal(right)
+        node['left'], node['right'] = get_term_node(left), get_term_node(right)
         return
-    # process left child
     if len(left) <= min_size:
-        node['left'] = to_terminal(left)
+        node['left'] = get_term_node(left)
     else:
-        node['left'] = get_split(left)
-        split(node['left'], max_depth, min_size, depth+1)
-    # process right child
+        node['left'] = get_split_pts(left)
+        split_till_term(node['left'], max_depth, min_size, depth+1)
     if len(right) <= min_size:
-        node['right'] = to_terminal(right)
+        node['right'] = get_term_node(right)
     else:
-        node['right'] = get_split(right)
-        split(node['right'], max_depth, min_size, depth+1)
+        node['right'] = get_split_pts(right)
+        split_till_term(node['right'], max_depth, min_size, depth+1)
 
-# Build a decision tree
-def build_tree(train, max_depth, min_size):
-    root = get_split(train)
-    split(root, max_depth, min_size, 1)
+def build_DTree(train, max_depth, min_size):
+    root = get_split_pts(train)
+    split_till_term(root, max_depth, min_size, 1)
     return root
 
-# Print a decision tree
-def print_tree(node, depth=0):
+def print_DTree(node, depth=0):
     if isinstance(node, dict):
         print('%s[X%d < %.3f]' % ((depth*' ', (node['index']+1), node['value'])))
-        print_tree(node['left'], depth+1)
-        print_tree(node['right'], depth+1)
+        print_DTree(node['left'], depth+1)
+        print_DTree(node['right'], depth+1)
     else:
         print('%s[%s]' % ((depth*' ', node)))
 
-
-# Make a prediction with a decision tree
 def predict(node, row):
     if row.iloc[node['index']] < node['value']:
         if isinstance(node['left'], dict):
@@ -109,34 +89,64 @@ def predict(node, row):
         else:
             return node['right']
 
-
 #save tree
-def save_tree(tree, max_depth, min_size):
-    with open('decision_tree'+max_depth+'_'+min_size+'.obj', 'w') as f:
+def save_model(tree, max_depth, min_size):
+    with open('decision_tree'+str(max_depth)+'_'+str(min_size)+'.obj', 'w') as f:
         pickle.dump(tree, f)
 
-
-#todo: read from cmd
-dataset = pd.read_csv('C:\\Users\\manuh\\Documents\\MWDB\\Phase3_\\CSE515Group9\\phase2\\3_class_gesture_data\\train_pca_tfidf.csv', header=None)
-all_labels = pd.read_excel('C:\\Users\\manuh\\Documents\\MWDB\\Phase3_\\CSE515Group9\\phase2\\3_class_gesture_data\\labels.xlsx', header=None) 
-#todo: take input from cmd.
-dataset = pd.concat([dataset,all_labels.iloc[:,-1:]],axis=1,ignore_index=True)
-test_labels = pd.DataFrame([row for index, row in all_labels.iterrows() if pd.isna(row.iloc[1]) or pd.isnull(row.iloc[1])])
-
-train_dataset = dataset[dataset.iloc[:,-1].notna()]
-print(train_dataset.shape)
-
-tree = build_tree(train_dataset,3,1)
-print_tree(tree)
-save_tree(tree,3,1)
+def get_actual_result(train_labels, index):
+    index_split = index.split("_")[0]
+    class_ = train_labels.loc[train_labels[train_labels.columns[1]] == index_split]
+    class_value = class_.iloc[0].iloc[2]
+    return class_value
 
 
-test_labels_indexes = [index for index,row in enumerate(test_labels)]
-predicted_outputs = []
+folder = sys.argv[1]
+vecoption = sys.argv[2]  # tf, tf-idf
+option = sys.argv[3]     # pca, svd, nfm, lda
 
-for index,row in test_labels.iterrows():
-    prediction = predict(tree,dataset.iloc[index])
-    predicted_outputs.append(prediction)
+with open(folder+'/f2i.dump', 'r') as fp:
+    f2i = json.load(fp)
+with open(folder+'/i2f.dump', 'r') as fp:
+    i2f = json.load(fp)
 
-    print(index, prediction)
-    # break
+train_labels = pd.read_excel(folder+'/labels.xlsx', header=None,names=['gesture','label']).astype(str)
+dataset = pd.read_csv(folder+'/train_'+option+'_'+vecoption+'.csv', header=None)
+train_dataset = pd.DataFrame()
+
+
+
+for index, row in train_labels.iterrows():
+    index_in_dataset = f2i[str(row.iloc[0])]
+    train_row = dataset.iloc[index_in_dataset]
+    train_dataset = train_dataset.append(train_row)
+
+print(train_dataset.head(40))
+test_dataset = pd.concat([dataset,train_dataset]).drop_duplicates(keep=False)
+
+
+train_dataset = train_dataset.reset_index()
+train_labels= train_labels.reset_index()
+
+
+train_dataset = pd.concat([train_dataset,train_labels.iloc[:,-1:]], axis=1, ignore_index=True)
+train_dataset = train_dataset.set_index(train_dataset.columns[0])
+print(train_dataset.head(40))
+
+tree = build_DTree(train_dataset,4,1)
+print_DTree(tree)
+# save_model(tree,3,1)
+
+
+# print(i2f)
+correct_classification = 0
+for index,row in test_dataset.iterrows():
+    prediction = predict(tree, row)
+    actual = get_actual_result(train_labels, i2f[str(index)])
+    # actual = 0
+    # print(index, prediction, actual)
+    
+    if actual == prediction:
+        correct_classification+=1
+    
+print("accuracy", correct_classification/test_dataset.shape[0])

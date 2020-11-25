@@ -12,13 +12,13 @@ import functools
 
 folder = sys.argv[1]
 os.chdir(folder)
-vecoption = 'tfidf'
-k = 9
-option = 'pca'
+vecoption = sys.argv[2]
+k = int(sys.argv[3])
+option = sys.argv[4]
 
-with open('f2i.dump', 'r') as fp:
+with open(folder+'/f2i.dump', 'r') as fp:
     f2i = json.load(fp)
-with open('i2f.dump', 'r') as fp:
+with open(folder+'/i2f.dump', 'r') as fp:
     i2f = json.load(fp)
 
 

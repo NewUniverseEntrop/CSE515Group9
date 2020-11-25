@@ -111,3 +111,12 @@ elif option == 'lda':
     np.savetxt(folder+"/train_lda_"+vecoption+".csv", lda_X, delimiter=",")
 else:
     print('wrong decomposition option')
+
+f2i_dump_file = 'f2i.dump'
+i2f_dump_file = 'i2f.dump'
+import json
+
+with open(f2i_dump_file, 'w') as fp:
+    json.dump(f2i, fp)
+with open(i2f_dump_file, 'w') as fp:
+    json.dump(i2f, fp)
