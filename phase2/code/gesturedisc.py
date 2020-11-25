@@ -142,6 +142,7 @@ elif option == 'dtw':
     for i in range(len(f2i)):
         gesture1 = words[i2f[i]]
         for j in range(i, len(f2i)):
+            print(i,j)
             gesture2 = words[i2f[j]]
             series1 = []
             series2 = []
@@ -157,6 +158,7 @@ elif option == 'dtw':
                     std2.append(wins['std'])
             distmatrix[i][j] = distmatrix[j][i] = dtw(series1, series2, avg1, avg2, std1, std2)
 
+np.save('distance_' + option + '.matrix',np.array(distmatrix))
 # convert distance to similarity
 if option == 'ed' or option == 'dtw':
     mx, mn = max(max(distmatrix)), min(min(distmatrix))
