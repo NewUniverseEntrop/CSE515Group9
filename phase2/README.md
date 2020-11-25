@@ -15,6 +15,13 @@ python task1.py folder 3 10 1,3,5
 
 
 ### Task 2
+#### Parameters:
+* path: relative path of the directory containing the gesture files.
+* vectormodel: tf or tfidf vectors.
+* topklatent: k no. of latent features to be selected.
+* latentoption: pca, svd, nmf or lda. This must be same in both command 3 and 4.
+* k: k nearest-neighbors.
+
 #### k-nearest neighbors
 ```
 python gesturewords.py path resolution windowsize stepsize
