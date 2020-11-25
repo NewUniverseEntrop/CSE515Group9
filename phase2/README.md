@@ -15,9 +15,40 @@ python task1.py folder 3 10 1,3,5
 
 
 ### Task 2
-[TBD] Manuha and Ravi
+#### k-nearest neighbors
+```
+python gesturewords.py path resolution windowsize stepsize
+python gesturevectors.py path
+python gesturelatent.py path vectormodel topklatent latentoption
+python task2_knn.py path vectormodel k latentoption
+```
+Example:
+```
+python gesturewords.py path 3 3 3
+python gesturevectors.py path
+python gesturelatent.py path 'tf' 4 'pca'
+python task2-knn.py path 'tf' 4 'pca'
+```
+
+
+#### PPR Classifier
 ```
 python ppr_classifier folder
+```
+
+#### Decision tree
+```
+python gesturewords.py path resolution windowsize stepsize
+python gesturevectors.py path
+python gesturelatent.py path vectormodel topklatent latentoption
+python task2_decisiontree.py path vectormodel latentoption
+```
+Example:
+```
+python gesturewords.py path 3 3 3
+python gesturevectors.py path
+python gesturelatent.py path 'tf' 4 'pca'
+python task2-knn.py path 'tf' 4 'pca'
 ```
 
 ### Task 3: Multi-dimensional index structures and nearest neighbor search task:
