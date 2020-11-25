@@ -1,4 +1,6 @@
 import pandas as pd
+import pickle
+
 
 # Split a dataset based on an attribute and an attribute value
 def test_split(column, value, dataset):
@@ -108,6 +110,12 @@ def predict(node, row):
             return node['right']
 
 
+#save tree
+def save_tree(tree, max_depth, min_size):
+    with open('decision_tree'+max_depth+'_'+min_size+'.obj', 'w') as f:
+        pickle.dump(tree, f)
+
+
 #todo: read from cmd
 dataset = pd.read_csv('C:\\Users\\manuh\\Documents\\MWDB\\Phase3_\\CSE515Group9\\phase2\\3_class_gesture_data\\train_pca_tfidf.csv', header=None)
 all_labels = pd.read_excel('C:\\Users\\manuh\\Documents\\MWDB\\Phase3_\\CSE515Group9\\phase2\\3_class_gesture_data\\labels.xlsx', header=None) 
@@ -120,6 +128,7 @@ print(train_dataset.shape)
 
 tree = build_tree(train_dataset,3,1)
 print_tree(tree)
+save_tree(tree,3,1)
 
 
 test_labels_indexes = [index for index,row in enumerate(test_labels)]
